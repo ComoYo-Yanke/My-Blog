@@ -846,9 +846,10 @@
                 <a data-nav="about" onclick="navigate('about')">About</a>
             </div>
             <div class="controls">
+                <!-- TODO -->
                 <!-- <button class="translate-btn" onclick="toggleTranslate()" id="translateBtn">
-                    🌐 <span>中文</span> 此功能移除
-                </button> --> 
+                    🌐 <span>中文</span> 
+                </button>  -->
                 <div class="theme-switch">
                     <button class="theme-btn" data-theme-btn="light" title="Light">☀️</button>
                     <button class="theme-btn" data-theme-btn="sepia" title="Sepia">📖</button>
@@ -884,24 +885,49 @@
         };
 
         /* ============================================================
-           2. 文章清单（只写英文）
-           ============================================================ */
-        const POSTS = [
-            {
-                slug: 'hello',
-                title: 'Hello, World',
-                date: '2026-10-14',
-                tags: ['Essay'],
-                excerpt: 'My first post — why I started blogging.',
-            },
-            {
-                slug: 'second',
-                title: 'My Second Post',
-                date: '2026-10-15',
-                tags: ['Tech', 'Frontend'],
-                excerpt: 'Notes on building a static blog and the pitfalls.',
-            },
-        ];
+           2. 文章清单
+           ── 不再手写数组：清单由 scripts/build-posts.mjs 扫描 posts/*.md 生成，
+              文章元信息写在每个 .md 顶部的 front matter 里
+           ── 新增文章 = 往 posts/ 丢一个 .md（然后跑一次脚本）
+        ============================================================ */
+        const POSTS_INDEX = 'posts/index.json';
+        let POSTS = [];
+        let postsError = null;
+        let postsLoaded = false;
+
+        /* 去掉 .md 顶部的 front matter，否则会被 marked 当成正文渲染出来 */
+        function stripFrontMatter(md) {
+            return md.replace(/^﻿?---[ \t]*\r?\n[\s\S]*?\r?\n---[ \t]*(\r?\n|$)/, '');
+        }
+
+        /* 载入清单。no-cache 保证重新部署后立刻能看到新文章，而不是吃缓存 */
+        async function loadPosts() {
+            if (postsLoaded) return POSTS;
+            try {
+                const res = await fetch(POSTS_INDEX, { cache: 'no-cache' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                POSTS = Array.isArray(data) ? data : (data.posts || []);
+                postsLoaded = true;
+                postsError = null; // 上次失败过，这次成功了就把错误清掉
+            } catch (e) {
+                /* 不设 postsLoaded，这样切页面时还会再试一次 */
+                postsError = e.message;
+                console.error('[posts] 载入 ' + POSTS_INDEX + ' 失败：' + e.message);
+            }
+            return POSTS;
+        }
+
+        /* 清单载入失败时给个能自救的提示，而不是干巴巴一句 "No posts yet" */
+        function postsErrorHTML() {
+            return `
+    <div class="empty">
+      <p>😕 Could not load <code>${POSTS_INDEX}</code> (${postsError})</p>
+      <p style="margin-top:10px;font-size:.9em">
+        Run <code>node scripts/build-posts.mjs</code> to regenerate it, then reload.
+      </p>
+    </div>`;
+        }
 
         /* ============================================================
            3. 开源项目清单
@@ -1063,13 +1089,18 @@
            ============================================================ */
         function navigate(path) { location.hash = '#/' + path; }
 
+        /* slug 里的中文等字符在 URL 里是百分号编码的，取出来要还原 */
+        function decodeSlug(s) {
+            try { return decodeURIComponent(s); } catch (e) { return s; }
+        }
+
         function parseRoute() {
             const raw = location.hash.replace(/^#\/?/, '');
             const parts = raw.split('/').filter(Boolean);
             if (parts.length === 0) return { page: 'home' };
             if (parts[0] === 'projects') return { page: 'projects' };
             if (parts[0] === 'about') return { page: 'about' };
-            if (parts[0] === 'post' && parts[1]) return { page: 'post', slug: parts[1] };
+            if (parts[0] === 'post' && parts[1]) return { page: 'post', slug: decodeSlug(parts[1]) };
             return { page: 'home' };
         }
 
@@ -1158,7 +1189,7 @@
             const sorted = POSTS.slice().sort((a, b) => b.date.localeCompare(a.date));
             const postsHTML = sorted.length
                 ? sorted.map(p => `
-        <a class="post-card" onclick="navigate('post/${p.slug}')">
+        <a class="post-card" onclick="navigate('post/${encodeURIComponent(p.slug)}')">
           <h2>${p.title}</h2>
           ${p.excerpt ? `<div class="excerpt">${p.excerpt}</div>` : ''}
           <div class="post-meta">
@@ -1167,7 +1198,7 @@
           </div>
         </a>
       `).join('')
-                : '<div class="empty">No posts yet.</div>';
+                : (postsError ? postsErrorHTML() : '<div class="empty">No posts yet.</div>');
 
             /* 首页只放 featured 的项目，没标注就退回前 3 个 */
             const featured = PROJECTS.filter(p => p.featured);
@@ -1333,6 +1364,7 @@
                 app.innerHTML = `
       <div class="empty fade-in">
         <p>😕 Post not found</p>
+        ${postsError ? postsErrorHTML() : ''}
         <p style="margin-top:10px"><a onclick="navigate('home')" style="cursor:pointer">Back to home</a></p>
       </div>`;
                 return;
@@ -1358,23 +1390,28 @@
             window.scrollTo(0, 0);
 
             const body = document.getElementById('post-body');
+            /* 用清单里的真实文件名取内容：文件名可以是中文，slug 只负责 URL */
+            const file = meta.file || slug + '.md';
             try {
-                const res = await fetch(`posts/${slug}.md`);
+                const res = await fetch('posts/' + encodeURIComponent(file));
                 if (!res.ok) throw new Error('not found');
                 const md = await res.text();
-                body.innerHTML = marked.parse(md);
+                body.innerHTML = marked.parse(stripFrontMatter(md));
                 if (isTranslated()) triggerTranslate();
             } catch (e) {
-                body.innerHTML = `<div class="empty">😕 Failed to load post (posts/${slug}.md)</div>`;
+                body.innerHTML = `<div class="empty">😕 Failed to load post (posts/${file})</div>`;
             }
         }
 
-        function router() {
+        async function router() {
             const route = parseRoute();
             if (route.page === 'projects') renderProjects();
             else if (route.page === 'about') renderAbout();
-            else if (route.page === 'post') renderPost(route.slug);
-            else renderHome();
+            else {
+                await loadPosts(); // 首页和文章页都要先拿到清单
+                if (route.page === 'post') await renderPost(route.slug);
+                else renderHome();
+            }
         }
 
         /* ============================================================
@@ -1470,6 +1507,9 @@
             document.querySelectorAll('[data-theme-btn]').forEach(btn => {
                 btn.addEventListener('click', () => applyTheme(btn.dataset.themeBtn));
             });
+
+            /* router 要先等清单载入，先摆个转圈占位 */
+            app.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
 
             window.addEventListener('hashchange', router);
             router();

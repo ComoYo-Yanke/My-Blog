@@ -17,36 +17,60 @@ A minimal static blog built with pure **HTML + CSS + JavaScript**, hosted on **C
 - 📝 Posts written in Markdown
 - 🚀 Projects showcase
 - 📋 One-click copy for contact info
-- ⚡ Zero build, zero dependencies (only marked.js via CDN)
+- ⚡ Zero dependencies (only marked.js via CDN) · one Node script regenerates the post list
 
 ### Structure
 
 ```
 .
-├── index.html      # Whole blog (HTML + CSS + JS in one file)
-├── README.md
-└── posts/          # Markdown posts
-    ├── hello.md
-    └── second.md
+├── index.html            # Whole blog (HTML + CSS + JS in one file)
+├── scripts/
+│   └── build-posts.mjs   # Scans posts/*.md, writes posts/index.json
+├── posts/
+│   ├── index.json        # GENERATED — the post list the site fetches
+│   ├── hello.md
+│   └── my-trip.md
+└── README.md
 ```
 
 ### Add a Post
 
-**1. Create a Markdown file** in `posts/`, e.g. `posts/my-trip.md`
+**1. Create a Markdown file** in `posts/` with front matter at the top:
 
-> Use only English letters, numbers and hyphens in the filename.
+```markdown
+---
+title: My Trip
+date: 2026-10-20
+tags: [Travel]
+excerpt: A short note about my first solo trip.
+---
 
-**2. Add an entry** to the `POSTS` array in `index.html`:
-
-```js
-{
-  slug: 'my-trip',           // must match the filename (without .md)
-  title: 'My Trip',
-  date: '2026-10-20',        // YYYY-MM-DD
-  tags: ['Travel'],          // optional
-  excerpt: 'A short note.',  // optional
-}
+Arrived in Tokyo. The weather was great.
 ```
+
+**2. Regenerate the list**:
+
+```bash
+node scripts/build-posts.mjs
+```
+
+That's the whole flow. The post shows up on the home page — **nothing in `index.html` needs editing.**
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `title` | ❌ | Falls back to the filename: `my-trip.md` → "My Trip" |
+| `date` | ❌ | `YYYY-MM-DD`. Falls back to the file's modified time |
+| `tags` | ❌ | `[Travel]` or `Travel, Notes` |
+| `excerpt` | ❌ | Falls back to the first real paragraph of the body |
+| `slug` | ❌ | The URL id. Defaults to the filename — set it when the filename isn't URL-friendly |
+| `draft` | ❌ | `true` keeps the file out of the list |
+
+**Notes** — a few things worth knowing before you write one:
+
+- **Non-ASCII filenames work.** `posts/羞耻文章.md` is served by its real name (the browser percent-encodes it), so Chinese titles are fine. Add `slug: shameful-draft` if you want a clean ASCII URL — the file itself stays as it is.
+- Files starting with `_` are ignored, so `_notes.md` won't be published.
+- Front matter is stripped before rendering, so the `---` block never shows up in the article body.
+- There is no `POSTS` array any more. Metadata lives with the post, so there's exactly one place to edit.
 
 ### Add a Project
 
@@ -108,6 +132,8 @@ python -m http.server 8000   # then open http://localhost:8000
 npx serve
 ```
 
+`posts/index.json` is committed, so the site previews as-is. After writing a new post, run `node scripts/build-posts.mjs` before reloading.
+
 ### Deploy to Cloudflare Pages
 
 1. Push the repo to GitHub / Gitee
@@ -117,16 +143,16 @@ npx serve
    | Field | Value |
    |-------|-------|
    | Framework preset | None |
-   | Build command | `exit 0` |
+   | Build command | `node scripts/build-posts.mjs` |
    | Build output directory | `/` |
 
 4. Deploy → get `xxx.pages.dev`
 
-**Updates**: just `git push`. Cloudflare auto-redeploys.
+**Updates**: just `git push`. Cloudflare reruns the build command and auto-redeploys, so a new `.md` goes live without touching anything else.
 
 ### Notes
 
-- `POSTS` and `PROJECTS` are **manually maintained**. Adding a post = 1 `.md` file + 1 array entry.
+- `PROJECTS` is still a **hand-maintained array** in `index.html`. Posts are not — they're discovered from `posts/*.md` by the build script.
 - Google Translate may be **unstable in mainland China**. For CN readers, browser built-in translation is a good fallback.
 - Themes use `localStorage`; translation uses Google's own `googtrans` cookie.
 
@@ -143,36 +169,60 @@ npx serve
 - 📝 文章用 Markdown 编写
 - 🚀 项目作品展示
 - 📋 联系方式一键复制
-- ⚡ 零构建、零依赖（仅 CDN 引入 marked.js）
+- ⚡ 零依赖（仅 CDN 引入 marked.js）· 一个 Node 脚本负责生成文章清单
 
 ### 项目结构
 
 ```
 .
-├── index.html      # 整个博客（HTML + CSS + JS 全在一个文件）
-├── README.md
-└── posts/          # Markdown 文章
-    ├── hello.md
-    └── second.md
+├── index.html            # 整个博客（HTML + CSS + JS 全在一个文件）
+├── scripts/
+│   └── build-posts.mjs   # 扫描 posts/*.md，生成 posts/index.json
+├── posts/
+│   ├── index.json        # 自动生成，页面读的就是它
+│   ├── hello.md
+│   └── my-trip.md
+└── README.md
 ```
 
 ### 新增文章
 
-**1. 在 `posts/` 下创建 Markdown 文件**，例如 `posts/my-trip.md`
+**1. 在 `posts/` 下创建 Markdown 文件**，开头写上 front matter：
 
-> 文件名只能用英文字母、数字和连字符。
+```markdown
+---
+title: My Trip
+date: 2026-10-20
+tags: [Travel]
+excerpt: 一句话摘要。
+---
 
-**2. 在 `index.html` 的 `POSTS` 数组里加一条**：
-
-```js
-{
-  slug: 'my-trip',           // 必须与文件名一致（不含 .md）
-  title: 'My Trip',
-  date: '2026-10-20',        // 格式 YYYY-MM-DD
-  tags: ['Travel'],          // 可选
-  excerpt: '一句话摘要。',    // 可选
-}
+正文内容……
 ```
+
+**2. 重新生成清单**：
+
+```bash
+node scripts/build-posts.mjs
+```
+
+就这两步，文章会自动出现在首页。**不用再动 `index.html` 里的任何东西。**
+
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| `title` | ❌ | 不写就用文件名，`my-trip.md` → "My Trip" |
+| `date` | ❌ | `YYYY-MM-DD`。不写就用文件的修改时间 |
+| `tags` | ❌ | `[Travel]` 或 `Travel, Notes` 都行 |
+| `excerpt` | ❌ | 不写就自动取正文第一段 |
+| `slug` | ❌ | URL 标识。默认用文件名，文件名不适合放 URL 时再设 |
+| `draft` | ❌ | 填 `true` 就不发布这篇 |
+
+**几点提醒**：
+
+- **文件名可以是中文**。`posts/羞耻文章.md` 会按真实文件名请求（浏览器自动百分号编码），所以中文标题完全没问题。想换成干净的英文短链就加一行 `slug: shameful-draft`，文件本身不用改名。
+- 以 `_` 开头的文件会被忽略，可以拿 `_notes.md` 当草稿箱。
+- front matter 在渲染前会被剥掉，不会跑到正文里显示成 `---`。
+- `POSTS` 数组已经删掉了，文章信息跟着文章走，只有一个地方要改。
 
 ### 新增项目
 
@@ -234,6 +284,8 @@ python -m http.server 8000   # 然后访问 http://localhost:8000
 npx serve
 ```
 
+`posts/index.json` 是提交进仓库的，所以直接预览就有内容。写了新文章后，先跑一次 `node scripts/build-posts.mjs` 再刷新。
+
 ### 部署到 Cloudflare Pages
 
 1. 把仓库推到 GitHub / Gitee
@@ -243,16 +295,16 @@ npx serve
    | 配置项 | 填写 |
    |--------|------|
    | Framework preset | None |
-   | Build command | `exit 0` |
+   | Build command | `node scripts/build-posts.mjs` |
    | Build output directory | `/` |
 
 4. 部署 → 得到 `xxx.pages.dev`
 
-**后续更新**：只需 `git push`，Cloudflare 自动重新部署。
+**后续更新**：只需 `git push`。Cloudflare 会重跑构建命令并自动重新部署，所以写好一篇 `.md` 推上去就上线了，别的什么都不用动。
 
 ### 注意事项
 
-- `POSTS` 和 `PROJECTS` 都是**手动维护**的。加一篇文章 = 1 个 `.md` 文件 + 1 条数组记录。
+- `PROJECTS` 仍然是 `index.html` 里**手动维护**的数组；文章不是，文章由构建脚本从 `posts/*.md` 自动发现。
 - Google 翻译在**中国大陆可能不稳定**。国内读者建议用浏览器自带翻译作为备选。
 - 主题用 `localStorage` 存储；翻译用 Google 自带的 `googtrans` cookie。
 
