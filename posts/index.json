@@ -1,13 +1,5 @@
 [
   {
-    "slug": "test",
-    "file": "test.md",
-    "title": "test",
-    "date": "2026-10-14",
-    "tags": [],
-    "excerpt": "test file"
-  },
-  {
     "slug": "羞耻文章",
     "file": "羞耻文章.md",
     "title": "羞耻文章",
@@ -24,5 +16,13 @@
       "Essay"
     ],
     "excerpt": "My first post — why I started blogging."
+  },
+  {
+    "slug": "test",
+    "file": "test.md",
+    "title": "Test",
+    "date": "2026-10-14",
+    "tags": [],
+    "excerpt": ""
   }
 ]

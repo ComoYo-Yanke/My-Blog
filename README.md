@@ -33,6 +33,8 @@ A minimal static blog built with pure **HTML + CSS + JavaScript**, hosted on **C
 └── README.md
 ```
 
+Pages: `#/` home (hero + latest posts + featured projects) · `#/posts` all posts · `#/projects` all projects · `#/about` · `#/post/<slug>` a single post.
+
 ### Add a Post
 
 **1. Create a Markdown file** in `posts/` with front matter at the top:
@@ -54,7 +56,7 @@ Arrived in Tokyo. The weather was great.
 node scripts/build-posts.mjs
 ```
 
-That's the whole flow. The post shows up on the home page — **nothing in `index.html` needs editing.**
+That's the whole flow. The post appears on the **Posts** page, and the home page shows the latest few — **nothing in `index.html` needs editing.**
 
 | Field | Required | Notes |
 |-------|----------|-------|
@@ -185,6 +187,8 @@ npx serve
 └── README.md
 ```
 
+页面：`#/` 首页（简介 + 最新文章 + 精选项目）· `#/posts` 全部文章 · `#/projects` 全部项目 · `#/about` 关于 · `#/post/<slug>` 文章详情。
+
 ### 新增文章
 
 **1. 在 `posts/` 下创建 Markdown 文件**，开头写上 front matter：
@@ -206,7 +210,7 @@ excerpt: 一句话摘要。
 node scripts/build-posts.mjs
 ```
 
-就这两步，文章会自动出现在首页。**不用再动 `index.html` 里的任何东西。**
+就这两步，文章会自动出现在 **Posts 页**（首页的 Latest Posts 只显示最新的几篇）。**不用再动 `index.html` 里的任何东西。**
 
 | 字段 | 必填 | 说明 |
 |------|------|------|

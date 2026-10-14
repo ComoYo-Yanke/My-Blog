@@ -330,12 +330,50 @@
             background: var(--border);
         }
 
+        /* 标题里的计数小圆牌 */
+        .section-title .count {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1px 8px;
+            font-size: .95em;
+            letter-spacing: 0;
+        }
+
+        /* 「查看全部 →」放最右边：order 让 .section-title::after 那条线排在它前面 */
+        .section-title .view-all {
+            order: 2;
+            text-transform: none;
+            letter-spacing: 0;
+            font-size: .95em;
+            color: var(--accent);
+            white-space: nowrap;
+        }
+
         /* 文章卡片 */
         .post-list {
             display: flex;
             flex-direction: column;
             gap: 14px;
             margin-bottom: 56px;
+        }
+
+        /* 文章页：和项目页一样的网格 */
+        .post-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
+            margin-bottom: 56px;
+        }
+
+        /* 网格里让卡片等高，日期/标签对齐到卡片底部 */
+        .post-grid .post-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post-grid .post-card .post-meta {
+            margin-top: auto;
         }
 
         .post-card {
@@ -826,7 +864,8 @@
                 font-size: .82em;
             }
 
-            .project-grid {
+            .project-grid,
+            .post-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -842,6 +881,7 @@
             </a>
             <div class="nav-links">
                 <a data-nav="home" onclick="navigate('home')">Home</a>
+                <a data-nav="posts" onclick="navigate('posts')">Posts</a>
                 <a data-nav="projects" onclick="navigate('projects')">Projects</a>
                 <a data-nav="about" onclick="navigate('about')">About</a>
             </div>
@@ -1098,6 +1138,7 @@
             const raw = location.hash.replace(/^#\/?/, '');
             const parts = raw.split('/').filter(Boolean);
             if (parts.length === 0) return { page: 'home' };
+            if (parts[0] === 'posts') return { page: 'posts' };
             if (parts[0] === 'projects') return { page: 'projects' };
             if (parts[0] === 'about') return { page: 'about' };
             if (parts[0] === 'post' && parts[1]) return { page: 'post', slug: decodeSlug(parts[1]) };
@@ -1182,22 +1223,62 @@
            ============================================================ */
 
         /* -------- 首页 -------- */
+        /* -------- 文章卡片（首页 / 文章页共用） -------- */
+        function renderPostCard(p) {
+            return `
+    <a class="post-card" onclick="navigate('post/${encodeURIComponent(p.slug)}')">
+      <h2>${p.title}</h2>
+      ${p.excerpt ? `<div class="excerpt">${p.excerpt}</div>` : ''}
+      <div class="post-meta">
+        <span>📅 ${p.date}</span>
+        ${(p.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+      </div>
+    </a>
+  `;
+        }
+
+        /* 按日期倒序，文章页和首页都用同一个顺序 */
+        function sortedPosts() {
+            return POSTS.slice().sort((a, b) => b.date.localeCompare(a.date));
+        }
+
+        function postCardsHTML() {
+            const sorted = sortedPosts();
+            if (!sorted.length) return postsError ? postsErrorHTML() : '<div class="empty">No posts yet.</div>';
+            return sorted.map(renderPostCard).join('');
+        }
+
+        /* -------- 联系方式行（文章页 / 项目页 / 关于页共用） -------- */
+        function contactRowsHTML() {
+            const rows = [
+                ['GitHub', SITE.github, SITE.github, true],
+                ['Gitee', SITE.gitee, SITE.gitee, true],
+                ['Email', SITE.email, 'mailto:' + SITE.email, false],
+            ];
+            return rows.map(([label, text, href, external]) => `
+        <div class="contact-row">
+          <span class="contact-label">${label}</span>
+          <span class="contact-value"><a href="${href}"${external ? ' target="_blank" rel="noopener"' : ''}>${text}</a></span>
+          <button class="copy-btn" onclick="copyText('${text}', this)">${ICONS.copy} Copy</button>
+        </div>`).join('');
+        }
+
+        function contactCardHTML() {
+            return `
+      <div class="about-card">${contactRowsHTML()}
+      </div>`;
+        }
+
+        /* -------- 首页 -------- */
+        const HOME_POST_LIMIT = 3; // 首页只放最新的几篇，全部在 Posts 页
+
         function renderHome() {
             setActiveNav('home');
             document.title = SITE.name + "'s Blog";
 
-            const sorted = POSTS.slice().sort((a, b) => b.date.localeCompare(a.date));
-            const postsHTML = sorted.length
-                ? sorted.map(p => `
-        <a class="post-card" onclick="navigate('post/${encodeURIComponent(p.slug)}')">
-          <h2>${p.title}</h2>
-          ${p.excerpt ? `<div class="excerpt">${p.excerpt}</div>` : ''}
-          <div class="post-meta">
-            <span>📅 ${p.date}</span>
-            ${(p.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
-          </div>
-        </a>
-      `).join('')
+            const preview = sortedPosts().slice(0, HOME_POST_LIMIT);
+            const postsHTML = preview.length
+                ? preview.map(renderPostCard).join('')
                 : (postsError ? postsErrorHTML() : '<div class="empty">No posts yet.</div>');
 
             /* 首页只放 featured 的项目，没标注就退回前 3 个 */
@@ -1213,11 +1294,28 @@
       <div class="socials">${socialButtons()}</div>
     </section>
 
-    <div class="section-title">Latest Posts</div>
+    <div class="section-title">Latest Posts${POSTS.length ? `<a class="view-all" onclick="navigate('posts')">View all →</a>` : ''}</div>
     <div class="post-list fade-in">${postsHTML}</div>
 
     <div class="section-title">Featured Projects</div>
     <div class="project-grid fade-in">${projectsPreview}</div>
+  `;
+            window.scrollTo(0, 0);
+        }
+
+        /* -------- 文章页（和项目页同构） -------- */
+        function renderPosts() {
+            setActiveNav('posts');
+            document.title = 'Posts - ' + SITE.name;
+
+            app.innerHTML = `
+    <div class="fade-in">
+      <div class="section-title">All Posts${POSTS.length ? `<span class="count">${POSTS.length}</span>` : ''}</div>
+      <div class="post-grid">${postCardsHTML()}</div>
+
+      <div class="section-title">Find me on</div>
+${contactCardHTML()}
+    </div>
   `;
             window.scrollTo(0, 0);
         }
@@ -1286,27 +1384,11 @@
 
             app.innerHTML = `
     <div class="fade-in">
-      <div class="section-title">Open Source Projects</div>
+      <div class="section-title">Open Source Projects${PROJECTS.length ? `<span class="count">${PROJECTS.length}</span>` : ''}</div>
       <div class="project-grid">${grid}</div>
 
       <div class="section-title">Find me on</div>
-      <div class="about-card">
-        <div class="contact-row">
-          <span class="contact-label">GitHub</span>
-          <span class="contact-value"><a href="${SITE.github}" target="_blank" rel="noopener">${SITE.github}</a></span>
-          <button class="copy-btn" onclick="copyText('${SITE.github}', this)">${ICONS.copy} Copy</button>
-        </div>
-        <div class="contact-row">
-          <span class="contact-label">Gitee</span>
-          <span class="contact-value"><a href="${SITE.gitee}" target="_blank" rel="noopener">${SITE.gitee}</a></span>
-          <button class="copy-btn" onclick="copyText('${SITE.gitee}', this)">${ICONS.copy} Copy</button>
-        </div>
-        <div class="contact-row">
-          <span class="contact-label">Email</span>
-          <span class="contact-value"><a href="mailto:${SITE.email}">${SITE.email}</a></span>
-          <button class="copy-btn" onclick="copyText('${SITE.email}', this)">${ICONS.copy} Copy</button>
-        </div>
-      </div>
+${contactCardHTML()}
     </div>
   `;
             window.scrollTo(0, 0);
@@ -1333,22 +1415,7 @@
           <li>Translation: Google Translate widget (one-click)</li>
         </ul>
 
-        <h3 style="margin:20px 0 10px;font-size:1.05em;">Contact</h3>
-        <div class="contact-row">
-          <span class="contact-label">GitHub</span>
-          <span class="contact-value"><a href="${SITE.github}" target="_blank" rel="noopener">${SITE.github}</a></span>
-          <button class="copy-btn" onclick="copyText('${SITE.github}', this)">${ICONS.copy} Copy</button>
-        </div>
-        <div class="contact-row">
-          <span class="contact-label">Gitee</span>
-          <span class="contact-value"><a href="${SITE.gitee}" target="_blank" rel="noopener">${SITE.gitee}</a></span>
-          <button class="copy-btn" onclick="copyText('${SITE.gitee}', this)">${ICONS.copy} Copy</button>
-        </div>
-        <div class="contact-row">
-          <span class="contact-label">Email</span>
-          <span class="contact-value"><a href="mailto:${SITE.email}">${SITE.email}</a></span>
-          <button class="copy-btn" onclick="copyText('${SITE.email}', this)">${ICONS.copy} Copy</button>
-        </div>
+        <h3 style="margin:20px 0 10px;font-size:1.05em;">Contact</h3>${contactRowsHTML()}
       </div>
     </div>
   `;
@@ -1356,8 +1423,8 @@
         }
 
         /* -------- 文章详情 -------- */
-        async function renderPost(slug) {
-            setActiveNav('');
+        async function renderPost(slug, seq) {
+            setActiveNav('posts'); // 文章详情属于 Posts 这一支，导航保持高亮
             const meta = POSTS.find(p => p.slug === slug);
 
             if (!meta) {
@@ -1396,20 +1463,30 @@
                 const res = await fetch('posts/' + encodeURIComponent(file));
                 if (!res.ok) throw new Error('not found');
                 const md = await res.text();
+                if (seq !== navSeq) return; // 正文还在路上时用户又跳走了，别覆盖新页面
                 body.innerHTML = marked.parse(stripFrontMatter(md));
                 if (isTranslated()) triggerTranslate();
             } catch (e) {
+                if (seq !== navSeq) return;
                 body.innerHTML = `<div class="empty">😕 Failed to load post (posts/${file})</div>`;
             }
         }
 
+        /* 每次导航自增。带 await 的渲染回来后先对一下号，
+           防止慢的那次把用户已经切过去的新页面覆盖掉。
+           例：清单还没载完就点了 Projects，首页那次渲染回来会把项目页顶掉。 */
+        let navSeq = 0;
+
         async function router() {
+            const seq = ++navSeq;
             const route = parseRoute();
             if (route.page === 'projects') renderProjects();
             else if (route.page === 'about') renderAbout();
             else {
-                await loadPosts(); // 首页和文章页都要先拿到清单
-                if (route.page === 'post') await renderPost(route.slug);
+                await loadPosts(); // 首页 / 文章页 / 文章详情都要先拿到清单
+                if (seq !== navSeq) return;
+                if (route.page === 'posts') renderPosts();
+                else if (route.page === 'post') await renderPost(route.slug, seq);
                 else renderHome();
             }
         }
