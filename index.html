@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoMoYo-Yanke's Blog</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --bg-soft: #f6f8fa;
+            --text: #1f2328;
+            --text-soft: #656d76;
+            --border: #d0d7de;
+            --accent: #0969da;
+            --accent-soft: #ddf4ff;
+            --code-bg: #f6f8fa;
+            --shadow: 0 1px 3px rgba(0, 0, 0, .06), 0 8px 24px rgba(0, 0, 0, .04);
+            --success: #1a7f37;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0d1117;
+            --bg-soft: #161b22;
+            --text: #e6edf3;
+            --text-soft: #8b949e;
+            --border: #30363d;
+            --accent: #58a6ff;
+            --accent-soft: #12283f;
+            --code-bg: #161b22;
+            --shadow: 0 1px 3px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+            --success: #3fb950;
+        }
+
+        [data-theme="sepia"] {
+            --bg: #f8f1e4;
+            --bg-soft: #efe6d5;
+            --text: #433422;
+            --text-soft: #8a7a63;
+            --border: #d9cdb6;
+            --accent: #a0522d;
+            --accent-soft: #f0e0cc;
+            --code-bg: #efe6d5;
+            --shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 8px 24px rgba(0, 0, 0, .05);
+            --success: #2e7d32;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+            transition: background .3s ease, color .3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* 导航 */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: color-mix(in srgb, var(--bg) 88%, transparent);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar-inner {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            font-size: 1.15em;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .brand:hover {
+            text-decoration: none;
+        }
+
+        .brand-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: inline-block;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-links a {
+            color: var(--text-soft);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: .92em;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .nav-links a:hover {
+            background: var(--bg-soft);
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .nav-links a.active {
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .theme-switch {
+            display: flex;
+            gap: 3px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .theme-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+        }
+
+        .theme-btn:hover {
+            background: var(--border);
+        }
+
+        .theme-btn.active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .translate-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
+            padding: 0 14px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: .88em;
+            color: var(--text-soft);
+            transition: all .2s;
+            font-family: inherit;
+        }
+
+        .translate-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .container {
+            flex: 1;
+            width: 100%;
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 32px 0 48px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 48px;
+        }
+
+        .avatar {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #a371f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            font-weight: 700;
+            margin: 0 auto 20px;
+            color: #fff;
+            box-shadow: var(--shadow);
+            letter-spacing: -.02em;
+        }
+
+        .hero h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            letter-spacing: -.02em;
+        }
+
+        .hero p {
+            color: var(--text-soft);
+            font-size: 1.02em;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .hero .socials {
+            margin-top: 22px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* 社交按钮（带图标） */
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: .88em;
+            color: var(--text-soft);
+            transition: all .2s;
+            cursor: pointer;
+            background: transparent;
+            font-family: inherit;
+        }
+
+        .social-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .social-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* 复制按钮 */
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: .88em;
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: all .2s;
+            background: transparent;
+            font-family: inherit;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .copy-btn.copied {
+            border-color: var(--success);
+            color: var(--success);
+            background: color-mix(in srgb, var(--success) 10%, transparent);
+        }
+
+        .section-title {
+            font-size: .82em;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: var(--text-soft);
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* 文章卡片 */
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 56px;
+        }
+
+        .post-card {
+            display: block;
+            padding: 20px 22px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all .22s ease;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        .post-card:hover {
+            text-decoration: none;
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .post-card h2 {
+            font-size: 1.18em;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-weight: 650;
+        }
+
+        .post-card .excerpt {
+            color: var(--text-soft);
+            font-size: .93em;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-meta {
+            display: flex;
+            gap: 14px;
+            font-size: .82em;
+            color: var(--text-soft);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .post-meta .tag {
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: .95em;
+        }
+
+        /* ========== 项目卡片 ========== */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
+            margin-bottom: 56px;
+        }
+
+        .project-card {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all .22s ease;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .project-card:hover {
+            text-decoration: none;
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .project-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .project-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .project-name {
+            font-weight: 650;
+            font-size: 1.02em;
+            color: var(--text);
+        }
+
+        .project-desc {
+            color: var(--text-soft);
+            font-size: .88em;
+            margin-bottom: 14px;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .project-foot {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: .8em;
+            color: var(--text-soft);
+        }
+
+        .project-lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .lang-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        .project-stars {
+            margin-left: auto;
+        }
+
+        /* 文章详情 */
+        .article-header {
+            margin-bottom: 36px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .article-header h1 {
+            font-size: 2em;
+            line-height: 1.3;
+            margin-bottom: 16px;
+            letter-spacing: -.02em;
+        }
+
+        .article-content {
+            font-size: 1.02em;
+        }
+
+        .article-content h2 {
+            font-size: 1.4em;
+            margin: 36px 0 14px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .article-content h3 {
+            font-size: 1.15em;
+            margin: 28px 0 12px;
+        }
+
+        .article-content p {
+            margin-bottom: 18px;
+        }
+
+        .article-content ul,
+        .article-content ol {
+            margin: 0 0 18px 24px;
+        }
+
+        .article-content li {
+            margin-bottom: 6px;
+        }
+
+        .article-content blockquote {
+            border-left: 4px solid var(--accent);
+            padding: 4px 0 4px 18px;
+            margin: 0 0 18px;
+            color: var(--text-soft);
+            background: var(--bg-soft);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .article-content code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 5px;
+            font-size: .88em;
+            font-family: "SFMono-Regular", Consolas, monospace;
+            border: 1px solid var(--border);
+        }
+
+        .article-content pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 18px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin-bottom: 18px;
+            font-size: .88em;
+            line-height: 1.6;
+        }
+
+        .article-content pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .article-content img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 12px 0;
+        }
+
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 18px;
+            font-size: .94em;
+        }
+
+        .article-content th,
+        .article-content td {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .article-content th {
+            background: var(--bg-soft);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-soft);
+            font-size: .9em;
+            margin-bottom: 28px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all .2s;
+        }
+
+        .back-btn:hover {
+            background: var(--bg-soft);
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* 关于页 */
+        .about-card {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 32px;
+        }
+
+        .about-card h2 {
+            margin-bottom: 16px;
+            font-size: 1.4em;
+        }
+
+        .about-card p {
+            margin-bottom: 14px;
+            color: var(--text-soft);
+        }
+
+        .about-card ul {
+            margin: 0 0 14px 22px;
+            color: var(--text-soft);
+        }
+
+        .about-card a {
+            font-weight: 500;
+        }
+
+        /* 联系方式行 */
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .contact-row:last-child {
+            border-bottom: none;
+        }
+
+        .contact-label {
+            color: var(--text-soft);
+            font-size: .9em;
+            min-width: 70px;
+        }
+
+        .contact-value {
+            flex: 1;
+            word-break: break-all;
+            font-size: .92em;
+        }
+
+        .loading,
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-soft);
+        }
+
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            margin: 0 auto 14px;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 28px 24px;
+            text-align: center;
+            color: var(--text-soft);
+            font-size: .85em;
+        }
+
+        footer a {
+            color: var(--text-soft);
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
+        .fade-in {
+            animation: fadeIn .35s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-size: .9em;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transition: all .3s ease;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Google 翻译：隐藏默认横幅和工具栏 */
+        .goog-te-banner-frame,
+        .skiptranslate>iframe.goog-te-banner-frame {
+            display: none !important;
+        }
+
+        body {
+            top: 0 !important;
+        }
+
+        .goog-tooltip,
+        .goog-tooltip:hover {
+            display: none !important;
+        }
+
+        .goog-text-highlight {
+            background: none !important;
+            box-shadow: none !important;
+        }
+
+        #google_translate_element {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 28px 16px 60px;
+            }
+
+            .navbar-inner {
+                padding: 12px 16px;
+            }
+
+            .hero h1 {
+                font-size: 1.6em;
+            }
+
+            .article-header h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-links a {
+                padding: 6px 9px;
+                font-size: .86em;
+            }
+
+            .theme-btn {
+                width: 27px;
+                height: 27px;
+                font-size: 12px;
+            }
+
+            .translate-btn {
+                height: 32px;
+                padding: 0 10px;
+                font-size: .82em;
+            }
+
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a class="brand" onclick="navigate('home')">
+                <span class="brand-dot"></span>CoMoYo-Yanke
+            </a>
+            <div class="nav-links">
+                <a data-nav="home" onclick="navigate('home')">Home</a>
+                <a data-nav="projects" onclick="navigate('projects')">Projects</a>
+                <a data-nav="about" onclick="navigate('about')">About</a>
+            </div>
+            <div class="controls">
+                <!-- <button class="translate-btn" onclick="toggleTranslate()" id="translateBtn">
+                    🌐 <span>中文</span> 此功能移除
+                </button> --> 
+                <div class="theme-switch">
+                    <button class="theme-btn" data-theme-btn="light" title="Light">☀️</button>
+                    <button class="theme-btn" data-theme-btn="sepia" title="Sepia">📖</button>
+                    <button class="theme-btn" data-theme-btn="dark" title="Dark">🌙</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" id="app"></main>
+
+    <footer>
+        © 2026 CoMoYo-Yanke · Powered by
+        <a href="https://pages.cloudflare.com" target="_blank">Cloudflare Pages</a>
+    </footer>
+
+    <div id="google_translate_element"></div>
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        /* ============================================================
+           1. 站点配置
+           ============================================================ */
+        const SITE = {
+            name: 'CoMoYo-Yanke',
+            avatar: 'CY',
+            bio: 'A place to record learning, thoughts and life.',
+            github: 'https://github.com/ComoYo-Yanke',
+            gitee: 'https://gitee.com/yanke_4_0',
+            email: 'comoyoyanke@outlook.com',
+        };
+
+        /* ============================================================
+           2. 文章清单（只写英文）
+           ============================================================ */
+        const POSTS = [
+            {
+                slug: 'hello',
+                title: 'Hello, World',
+                date: '2026-10-14',
+                tags: ['Essay'],
+                excerpt: 'My first post — why I started blogging.',
+            },
+            {
+                slug: 'second',
+                title: 'My Second Post',
+                date: '2026-10-15',
+                tags: ['Tech', 'Frontend'],
+                excerpt: 'Notes on building a static blog and the pitfalls.',
+            },
+        ];
+
+        /* ============================================================
+           3. 开源项目清单
+           ============================================================ */
+        const PROJECTS = [
+            {
+                name: 'My-Blog',
+                desc: 'A static blog built with pure HTML, CSS and JavaScript, hosted on Cloudflare Pages.',
+                url: 'https://github.com/ComoYo-Yanke',
+                icon: '📝',
+                lang: 'JavaScript',
+                langColor: '#f1e05a',
+                stars: 12,
+            },
+            {
+                name: 'Awesome-Tools',
+                desc: 'A collection of small developer utilities written in Python — CLI tools for daily use.',
+                url: 'https://gitee.com/yanke_4_0',
+                icon: '🧰',
+                lang: 'Python',
+                langColor: '#3572A5',
+                stars: 34,
+            },
+            {
+                name: 'Web-Demo',
+                desc: 'Front-end experiments and UI component demos. Built with vanilla JS + CSS.',
+                url: 'https://github.com/ComoYo-Yanke',
+                icon: '🎨',
+                lang: 'HTML',
+                langColor: '#e34c26',
+                stars: 8,
+            },
+            {
+                name: 'Note-Vault',
+                desc: 'Personal knowledge base and Markdown notes, synced across devices.',
+                url: 'https://gitee.com/yanke_4_0',
+                icon: '📚',
+                lang: 'Markdown',
+                langColor: '#083fa1',
+                stars: 5,
+            },
+        ];
+
+        /* ============================================================
+           4. 主题持久化
+           ============================================================ */
+        const THEMES = ['light', 'sepia', 'dark'];
+
+        function applyTheme(theme) {
+            if (!THEMES.includes(theme)) theme = 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('blog-theme', theme);
+            document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.themeBtn === theme);
+            });
+        }
+
+        /* ============================================================
+           5. 路由
+           ============================================================ */
+        function navigate(path) { location.hash = '#/' + path; }
+
+        function parseRoute() {
+            const raw = location.hash.replace(/^#\/?/, '');
+            const parts = raw.split('/').filter(Boolean);
+            if (parts.length === 0) return { page: 'home' };
+            if (parts[0] === 'projects') return { page: 'projects' };
+            if (parts[0] === 'about') return { page: 'about' };
+            if (parts[0] === 'post' && parts[1]) return { page: 'post', slug: parts[1] };
+            return { page: 'home' };
+        }
+
+        /* ============================================================
+           6. 工具函数
+           ============================================================ */
+        const app = document.getElementById('app');
+
+        function setActiveNav(page) {
+            document.querySelectorAll('[data-nav]').forEach(el => {
+                el.classList.toggle('active', el.dataset.nav === page);
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 1800);
+        }
+
+        async function copyText(text, btn) {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    // 兼容旧浏览器 / 非 HTTPS
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+                showToast('✅ Copied: ' + text);
+                if (btn) {
+                    const original = btn.innerHTML;
+                    btn.classList.add('copied');
+                    btn.innerHTML = '✓ Copied';
+                    setTimeout(() => {
+                        btn.classList.remove('copied');
+                        btn.innerHTML = original;
+                    }, 1500);
+                }
+            } catch (e) {
+                showToast('❌ Copy failed');
+            }
+        }
+
+        /* SVG 图标 */
+        const ICONS = {
+            github: `<svg viewBox="0 0 24 24"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.2-.1-.3-.5-1.5.1-3 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.5.2 2.7.1 3 .8.9 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>`,
+            gitee: `<svg viewBox="0 0 24 24"><path d="M11.984 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0011.984 0zm6.09 6.28a.51.51 0 01.49.42c.02.13-.24 2.15-.4 3.05a.78.78 0 01-.77.65H8.3a.41.41 0 00-.4.42v.06c0 .23.18.41.4.41h8.48a.77.77 0 01.77.65c.06.36.16 1.03.16 1.03a.78.78 0 01-.77.9H8.24a2.4 2.4 0 01-2.4-2.4v-3.3a2.4 2.4 0 012.4-2.4h9.34c.26 0 .47.19.49.42z"/></svg>`,
+            mail: `<svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`,
+            copy: `<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>`,
+            star: `<svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+        };
+
+        /* 生成社交按钮 HTML */
+        function socialButtons() {
+            return `
+    <a class="social-btn" href="${SITE.github}" target="_blank" rel="noopener">
+      ${ICONS.github} GitHub
+    </a>
+    <a class="social-btn" href="${SITE.gitee}" target="_blank" rel="noopener">
+      ${ICONS.gitee} Gitee
+    </a>
+    <button class="social-btn" onclick="copyText('${SITE.email}', this)">
+      ${ICONS.mail} Email
+    </button>
+  `;
+        }
+
+        /* ============================================================
+           7. 渲染页面
+           ============================================================ */
+
+        /* -------- 首页 -------- */
+        function renderHome() {
+            setActiveNav('home');
+            document.title = SITE.name + "'s Blog";
+
+            const sorted = POSTS.slice().sort((a, b) => b.date.localeCompare(a.date));
+            const postsHTML = sorted.length
+                ? sorted.map(p => `
+        <a class="post-card" onclick="navigate('post/${p.slug}')">
+          <h2>${p.title}</h2>
+          ${p.excerpt ? `<div class="excerpt">${p.excerpt}</div>` : ''}
+          <div class="post-meta">
+            <span>📅 ${p.date}</span>
+            ${(p.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+          </div>
+        </a>
+      `).join('')
+                : '<div class="empty">No posts yet.</div>';
+
+            const projectsPreview = PROJECTS.slice(0, 3).map(renderProjectCard).join('');
+
+            app.innerHTML = `
+    <section class="hero fade-in">
+      <div class="avatar">${SITE.avatar}</div>
+      <h1>${SITE.name}</h1>
+      <p>${SITE.bio}</p>
+      <div class="socials">${socialButtons()}</div>
+    </section>
+
+    <div class="section-title">Latest Posts</div>
+    <div class="post-list fade-in">${postsHTML}</div>
+
+    <div class="section-title">Featured Projects</div>
+    <div class="project-grid fade-in">${projectsPreview}</div>
+  `;
+            window.scrollTo(0, 0);
+        }
+
+        /* -------- 项目页 -------- */
+        function renderProjectCard(p) {
+            return `
+    <a class="project-card" href="${p.url}" target="_blank" rel="noopener">
+      <div class="project-head">
+        <div class="project-icon">${p.icon}</div>
+        <div class="project-name">${p.name}</div>
+      </div>
+      <div class="project-desc">${p.desc}</div>
+      <div class="project-foot">
+        <span class="project-lang">
+          <span class="lang-dot" style="background:${p.langColor}"></span>
+          ${p.lang}
+        </span>
+        ${p.stars ? `<span class="project-stars">${ICONS.star} ${p.stars}</span>` : ''}
+      </div>
+    </a>
+  `;
+        }
+
+        function renderProjects() {
+            setActiveNav('projects');
+            document.title = 'Projects - ' + SITE.name;
+
+            const grid = PROJECTS.length
+                ? PROJECTS.map(renderProjectCard).join('')
+                : '<div class="empty">No projects yet.</div>';
+
+            app.innerHTML = `
+    <div class="fade-in">
+      <div class="section-title">Open Source Projects</div>
+      <div class="project-grid">${grid}</div>
+
+      <div class="section-title">Find me on</div>
+      <div class="about-card">
+        <div class="contact-row">
+          <span class="contact-label">GitHub</span>
+          <span class="contact-value"><a href="${SITE.github}" target="_blank" rel="noopener">${SITE.github}</a></span>
+          <button class="copy-btn" onclick="copyText('${SITE.github}', this)">${ICONS.copy} Copy</button>
+        </div>
+        <div class="contact-row">
+          <span class="contact-label">Gitee</span>
+          <span class="contact-value"><a href="${SITE.gitee}" target="_blank" rel="noopener">${SITE.gitee}</a></span>
+          <button class="copy-btn" onclick="copyText('${SITE.gitee}', this)">${ICONS.copy} Copy</button>
+        </div>
+        <div class="contact-row">
+          <span class="contact-label">Email</span>
+          <span class="contact-value"><a href="mailto:${SITE.email}">${SITE.email}</a></span>
+          <button class="copy-btn" onclick="copyText('${SITE.email}', this)">${ICONS.copy} Copy</button>
+        </div>
+      </div>
+    </div>
+  `;
+            window.scrollTo(0, 0);
+        }
+
+        /* -------- 关于页 -------- */
+        function renderAbout() {
+            setActiveNav('about');
+            document.title = 'About - ' + SITE.name;
+
+            app.innerHTML = `
+    <div class="fade-in">
+      <div class="section-title">About Me</div>
+      <div class="about-card">
+        <h2>Hi, I'm ${SITE.name} 👋</h2>
+        <p>${SITE.bio}</p>
+        <p>This blog is built with pure HTML + CSS + JavaScript and hosted on Cloudflare Pages.</p>
+
+        <h3 style="margin:20px 0 10px;font-size:1.05em;">Tech Stack</h3>
+        <ul>
+          <li>Hosting: Cloudflare Pages</li>
+          <li>Markdown: marked.js</li>
+          <li>Themes: Light / Sepia / Dark, remembered via localStorage</li>
+          <li>Translation: Google Translate widget (one-click)</li>
+        </ul>
+
+        <h3 style="margin:20px 0 10px;font-size:1.05em;">Contact</h3>
+        <div class="contact-row">
+          <span class="contact-label">GitHub</span>
+          <span class="contact-value"><a href="${SITE.github}" target="_blank" rel="noopener">${SITE.github}</a></span>
+          <button class="copy-btn" onclick="copyText('${SITE.github}', this)">${ICONS.copy} Copy</button>
+        </div>
+        <div class="contact-row">
+          <span class="contact-label">Gitee</span>
+          <span class="contact-value"><a href="${SITE.gitee}" target="_blank" rel="noopener">${SITE.gitee}</a></span>
+          <button class="copy-btn" onclick="copyText('${SITE.gitee}', this)">${ICONS.copy} Copy</button>
+        </div>
+        <div class="contact-row">
+          <span class="contact-label">Email</span>
+          <span class="contact-value"><a href="mailto:${SITE.email}">${SITE.email}</a></span>
+          <button class="copy-btn" onclick="copyText('${SITE.email}', this)">${ICONS.copy} Copy</button>
+        </div>
+      </div>
+    </div>
+  `;
+            window.scrollTo(0, 0);
+        }
+
+        /* -------- 文章详情 -------- */
+        async function renderPost(slug) {
+            setActiveNav('');
+            const meta = POSTS.find(p => p.slug === slug);
+
+            if (!meta) {
+                app.innerHTML = `
+      <div class="empty fade-in">
+        <p>😕 Post not found</p>
+        <p style="margin-top:10px"><a onclick="navigate('home')" style="cursor:pointer">Back to home</a></p>
+      </div>`;
+                return;
+            }
+
+            document.title = meta.title + ' - ' + SITE.name;
+
+            app.innerHTML = `
+    <a class="back-btn" onclick="navigate('home')">← Back to list</a>
+    <article class="fade-in">
+      <header class="article-header">
+        <h1>${meta.title}</h1>
+        <div class="post-meta">
+          <span>📅 ${meta.date}</span>
+          ${(meta.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+        </div>
+      </header>
+      <div class="article-content" id="post-body">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </article>
+  `;
+            window.scrollTo(0, 0);
+
+            const body = document.getElementById('post-body');
+            try {
+                const res = await fetch(`posts/${slug}.md`);
+                if (!res.ok) throw new Error('not found');
+                const md = await res.text();
+                body.innerHTML = marked.parse(md);
+                if (isTranslated()) triggerTranslate();
+            } catch (e) {
+                body.innerHTML = `<div class="empty">😕 Failed to load post (posts/${slug}.md)</div>`;
+            }
+        }
+
+        function router() {
+            const route = parseRoute();
+            if (route.page === 'projects') renderProjects();
+            else if (route.page === 'about') renderAbout();
+            else if (route.page === 'post') renderPost(route.slug);
+            else renderHome();
+        }
+
+        /* ============================================================
+           8. Google 翻译集成
+           ============================================================ */
+        let translateReady = false;
+
+        function isTranslated() {
+            const v = getCookie('googtrans');
+            return v && v.includes('/zh-CN');
+        }
+
+        function getCookie(name) {
+            const m = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return m ? decodeURIComponent(m[2]) : null;
+        }
+
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + days * 864e5);
+            document.cookie = `${name}=${value}; expires=${d.toUTCString()}; path=/`;
+        }
+
+        function deleteCookie(name) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${location.hostname}`;
+        }
+
+        function toggleTranslate() {
+            if (!translateReady) {
+                alert('翻译组件还在加载，请稍候再试。');
+                return;
+            }
+            if (isTranslated()) {
+                deleteCookie('googtrans');
+                location.reload();
+            } else {
+                setCookie('googtrans', '/en/zh-CN', 365);
+                location.reload();
+            }
+        }
+
+        function triggerTranslate() {
+            if (window.google && window.google.translate) {
+                const sel = document.querySelector('.goog-te-combo');
+                if (sel) { sel.value = 'zh-CN'; sel.dispatchEvent(new Event('change')); }
+            }
+        }
+
+        function updateTranslateBtn() {
+            const btn = document.getElementById('translateBtn');
+            if (!btn) return;
+            const span = btn.querySelector('span');
+            if (isTranslated()) {
+                span.textContent = 'English';
+                btn.title = 'Show original English';
+            } else {
+                span.textContent = '中文';
+                btn.title = '翻译成中文';
+            }
+        }
+
+        function loadGoogleTranslate() {
+            window.googleTranslateElementInit = function () {
+                new google.translate.TranslateElement(
+                    { pageLanguage: 'en', includedLanguages: 'zh-CN,en', autoDisplay: false },
+                    'google_translate_element'
+                );
+                translateReady = true;
+                updateTranslateBtn();
+            };
+            const s = document.createElement('script');
+            s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            s.async = true;
+            document.head.appendChild(s);
+        }
+
+        /* ============================================================
+           9. 初始化
+           ============================================================ */
+        function init() {
+            const savedTheme = localStorage.getItem('blog-theme');
+            if (savedTheme && THEMES.includes(savedTheme)) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.themeBtn === savedTheme);
+                });
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyTheme(prefersDark ? 'dark' : 'light');
+            }
+
+            document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+                btn.addEventListener('click', () => applyTheme(btn.dataset.themeBtn));
+            });
+
+            window.addEventListener('hashchange', router);
+            router();
+            updateTranslateBtn();
+            loadGoogleTranslate();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

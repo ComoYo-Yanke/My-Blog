@@ -1,0 +1,122 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.7;
+    color: #333;
+    background: #fafafa;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+header {
+    margin-bottom: 40px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+
+header h1 a {
+    color: #222;
+    text-decoration: none;
+    font-size: 1.8em;
+}
+
+.subtitle {
+    color: #999;
+    font-size: 0.9em;
+    margin-top: 6px;
+}
+
+/* 文章列表 */
+.post-item {
+    margin-bottom: 28px;
+}
+
+.post-item h2 {
+    font-size: 1.3em;
+    margin-bottom: 6px;
+}
+
+.post-item h2 a {
+    color: #0366d6;
+    text-decoration: none;
+}
+
+.post-item h2 a:hover {
+    text-decoration: underline;
+}
+
+.post-item .date {
+    color: #999;
+    font-size: 0.85em;
+}
+
+/* 文章详情 */
+.article h1 {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+.article .date {
+    color: #999;
+    font-size: 0.85em;
+    margin-bottom: 30px;
+}
+
+.article p {
+    margin-bottom: 16px;
+}
+
+.article h2 {
+    font-size: 1.3em;
+    margin: 28px 0 12px;
+}
+
+.article code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.article pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+}
+
+.article pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+}
+
+.back-btn {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #0366d6;
+    cursor: pointer;
+    font-size: 0.9em;
+    text-decoration: none;
+}
+
+.back-btn:hover {
+    text-decoration: underline;
+}
+
+footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.85em;
+    text-align: center;
+}
