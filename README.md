@@ -56,15 +56,32 @@ Add an entry to the `PROJECTS` array in `index.html`:
 {
   name: 'My-Project',
   desc: 'What this project does.',
-  url: 'https://github.com/ComoYo-Yanke',
-  icon: '🚀',                // emoji
-  lang: 'JavaScript',        // optional
-  langColor: '#f1e05a',      // optional
-  stars: 12,                 // optional
+  url: 'https://github.com/ComoYo-Yanke/My-Project',
+  icon: '🚀',                       // emoji
+  host: 'github',                   // 'github' | 'gitee' — picks the card badge
+  featured: true,                   // optional — show on the home page
+  langs: [                          // optional
+    { name: 'TypeScript', pct: 90.3 },
+    { name: 'CSS', pct: 9.6 },
+  ],
+  stars: 12,                        // optional — shown whenever it's a number
 }
 ```
 
-**Common language colors**: JavaScript `#f1e05a` · TypeScript `#3178c6` · Python `#3572A5` · HTML `#e34c26` · CSS `#563d7c` · Go `#00ADD8` · Rust `#dea584` · Java `#b07219`
+| Field | Required | Notes |
+|-------|----------|-------|
+| `name` | ✅ | Project name |
+| `desc` | ✅ | Clamped to 3 lines on the card |
+| `url` | ✅ | GitHub or Gitee repo link |
+| `icon` | ❌ | Emoji |
+| `host` | ❌ | `'github'` (default) or `'gitee'` — the badge in the corner and the star tooltip |
+| `featured` | ❌ | The home page shows featured projects; if none are marked, the first 3 are used |
+| `langs` | ❌ | `langs[0]` is the primary language. Percentage bars are drawn only when `pct` is present — without real stats, just list the names |
+| `stars` | ❌ | Rendered whenever it's a number, **including `0`** |
+
+**Colors are not set per project** — `LANG_COLORS` in `index.html` maps a language name to its GitHub Linguist color. Add new languages there.
+
+**Where the numbers come from**: the GitHub `/languages` endpoint and the Gitee repo API. Every entry in this repo was pulled on **2026-10-14**; refresh by hand as stars and languages drift.
 
 ### Edit Personal Info
 
@@ -165,15 +182,32 @@ npx serve
 {
   name: 'My-Project',
   desc: '这个项目是做什么的。',
-  url: 'https://github.com/ComoYo-Yanke',
-  icon: '🚀',                // emoji 图标
-  lang: 'JavaScript',        // 可选
-  langColor: '#f1e05a',      // 可选
-  stars: 12,                 // 可选
+  url: 'https://github.com/ComoYo-Yanke/My-Project',
+  icon: '🚀',                       // emoji 图标
+  host: 'github',                   // 'github' | 'gitee'，决定卡片角标
+  featured: true,                   // 可选：是否在首页展示
+  langs: [                          // 可选
+    { name: 'TypeScript', pct: 90.3 },
+    { name: 'CSS', pct: 9.6 },
+  ],
+  stars: 12,                        // 可选：填了数字就会显示
 }
 ```
 
-**常用语言色值**：JavaScript `#f1e05a` · TypeScript `#3178c6` · Python `#3572A5` · HTML `#e34c26` · CSS `#563d7c` · Go `#00ADD8` · Rust `#dea584` · Java `#b07219`
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| `name` | ✅ | 项目名称 |
+| `desc` | ✅ | 项目描述，卡片上最多显示 3 行 |
+| `url` | ✅ | 仓库链接（GitHub / Gitee 均可） |
+| `icon` | ❌ | emoji 图标 |
+| `host` | ❌ | `'github'`（默认）或 `'gitee'`，决定卡片角标和 star 悬浮提示的文案 |
+| `featured` | ❌ | 首页只展示标了 `featured` 的项目；一个都没标就退回前 3 个 |
+| `langs` | ❌ | `langs[0]` 为主语言。**带 `pct` 才会画语言占比条**，没有统计数据的就只列语言名 |
+| `stars` | ❌ | 只要填了数字就会显示，**包括 `0`** |
+
+**颜色不用每个项目单独写**：`index.html` 里的 `LANG_COLORS` 负责按语言名查色（取自 GitHub Linguist），加新语言改那一处即可。
+
+**数据从哪来**：GitHub API 的 `/languages` 接口 + Gitee 仓库接口。本仓库的项目数据抓取于 **2026-10-14**，星标和语言变动后记得手动更新。
 
 ### 修改个人信息
 

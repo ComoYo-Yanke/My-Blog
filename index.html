@@ -441,6 +441,28 @@
             font-weight: 650;
             font-size: 1.02em;
             color: var(--text);
+            overflow-wrap: anywhere;
+        }
+
+        /* 仓库所在平台（GitHub / Gitee） */
+        .project-host {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-soft);
+            opacity: .6;
+            flex-shrink: 0;
+        }
+
+        .project-host svg {
+            width: 15px;
+            height: 15px;
+            fill: currentColor;
+        }
+
+        .project-card:hover .project-host {
+            opacity: 1;
+            color: var(--accent);
         }
 
         .project-desc {
@@ -454,12 +476,28 @@
             overflow: hidden;
         }
 
+        /* 语言占比条（GitHub Linguist 统计） */
+        .lang-bar {
+            display: flex;
+            height: 4px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            background: var(--bg-soft);
+        }
+
+        .lang-bar span {
+            display: block;
+            height: 100%;
+        }
+
         .project-foot {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: .8em;
             color: var(--text-soft);
+            flex-wrap: wrap;
         }
 
         .project-lang {
@@ -867,43 +905,142 @@
 
         /* ============================================================
            3. 开源项目清单
-           ============================================================ */
+           ── 数据来源：GitHub API / Gitee API，抓取于 2026-10-14
+           ── langs 里带 pct 的为仓库语言占比统计；不带 pct 的为仓库文件构成
+        ============================================================ */
+        /* 语言配色，取自 GitHub Linguist */
+        const LANG_COLORS = {
+            JavaScript: '#f1e05a',
+            TypeScript: '#3178c6',
+            Vue: '#41b883',
+            CSS: '#563d7c',
+            SCSS: '#c6538c',
+            Sass: '#a53b70',
+            HTML: '#e34c26',
+            Python: '#3572A5',
+            Java: '#b07219',
+            Markdown: '#083fa1',
+        };
+
         const PROJECTS = [
             {
-                name: 'My-Blog',
-                desc: 'A static blog built with pure HTML, CSS and JavaScript, hosted on Cloudflare Pages.',
-                url: 'https://github.com/ComoYo-Yanke',
-                icon: '📝',
-                lang: 'JavaScript',
-                langColor: '#f1e05a',
-                stars: 12,
+                name: 'MOA',
+                desc: 'Minecraft Online Assistant — a desktop tool that simplifies online multiplayer, supporting LAN, VPN, server and intranet penetration. Fully free and non-profit.',
+                url: 'https://github.com/ComoYo-Yanke/MOA',
+                icon: '⛏️',
+                host: 'github',
+                featured: true,
+                langs: [
+                    { name: 'Vue', pct: 72.5 },
+                    { name: 'JavaScript', pct: 11.9 },
+                    { name: 'CSS', pct: 7.6 },
+                    { name: 'TypeScript', pct: 6.4 },
+                    { name: 'HTML', pct: 1.6 },
+                ],
+                stars: 2,
             },
             {
-                name: 'Awesome-Tools',
-                desc: 'A collection of small developer utilities written in Python — CLI tools for daily use.',
-                url: 'https://gitee.com/yanke_4_0',
-                icon: '🧰',
-                lang: 'Python',
-                langColor: '#3572A5',
-                stars: 34,
+                name: 'my-daw',
+                desc: 'A digital audio workstation (DAW), similar to FL Studio.',
+                url: 'https://github.com/ComoYo-Yanke/my-daw',
+                icon: '🎹',
+                host: 'github',
+                featured: true,
+                langs: [
+                    { name: 'TypeScript', pct: 90.3 },
+                    { name: 'CSS', pct: 9.6 },
+                ],
+                stars: 1,
             },
             {
-                name: 'Web-Demo',
-                desc: 'Front-end experiments and UI component demos. Built with vanilla JS + CSS.',
-                url: 'https://github.com/ComoYo-Yanke',
-                icon: '🎨',
-                lang: 'HTML',
-                langColor: '#e34c26',
-                stars: 8,
+                name: 'CCHabit',
+                desc: 'Fully local · No server · No account · No network. A TapHabit-style habit tracker — all data lives in WeChat Mini Program storage.',
+                url: 'https://github.com/ComoYo-Yanke/CCHabit',
+                icon: '🌱',
+                host: 'github',
+                featured: true,
+                langs: [{ name: 'JavaScript', pct: 100 }],
+                stars: 1,
             },
             {
-                name: 'Note-Vault',
-                desc: 'Personal knowledge base and Markdown notes, synced across devices.',
-                url: 'https://gitee.com/yanke_4_0',
+                name: 'AI-Blog',
+                desc: 'An enterprise-grade full-stack blog platform with real-time capabilities.',
+                url: 'https://github.com/ComoYo-Yanke/AI-Blog',
+                icon: '📰',
+                host: 'github',
+                langs: [
+                    { name: 'Vue', pct: 48.0 },
+                    { name: 'Java', pct: 44.4 },
+                    { name: 'JavaScript', pct: 5.0 },
+                    { name: 'CSS', pct: 2.4 },
+                ],
+                stars: 0,
+            },
+            {
+                name: 'flight-control-ground-station',
+                desc: 'A ground control station for drones with WebSocket communication, real-time map display and autonomous navigation.',
+                url: 'https://github.com/ComoYo-Yanke/flight-control-ground-station',
+                icon: '🛩️',
+                host: 'github',
+                langs: [
+                    { name: 'Python', pct: 82.2 },
+                    { name: 'HTML', pct: 17.8 },
+                ],
+                stars: 1,
+            },
+            {
+                name: 'hly-system',
+                desc: "Records the user's health status, including daily meals, water intake, wake-up and sleep times, and exercise.",
+                url: 'https://github.com/ComoYo-Yanke/hly-system',
+                icon: '🩺',
+                host: 'github',
+                langs: [
+                    { name: 'Java', pct: 98.2 },
+                    { name: 'JavaScript', pct: 1.2 },
+                ],
+                stars: 0,
+            },
+            {
+                name: 'HCIA-Practice-miniProgramme',
+                desc: 'A practice mini-program tailored for HCIA exam preparation. Native WeChat mini-program, zero backend, entirely local — import your own question bank and drill it on the memory curve.',
+                url: 'https://gitee.com/yanke_4_0/base_bank_practice',
                 icon: '📚',
-                lang: 'Markdown',
-                langColor: '#083fa1',
-                stars: 5,
+                host: 'gitee',
+                langs: [{ name: 'TypeScript' }, { name: 'Sass' }],
+                stars: 0,
+            },
+            {
+                name: 'Class Fee System',
+                desc: 'A class common-account bookkeeping tool built with Spring Boot 3, Vue 3, Element Plus, ECharts and SQLite.',
+                url: 'https://gitee.com/yanke_4_0/class-fee-system',
+                icon: '💰',
+                host: 'gitee',
+                langs: [{ name: 'Java' }, { name: 'Vue' }],
+                stars: 0,
+            },
+            {
+                name: 'LiMind',
+                desc: 'A lightweight, free mind-mapping tool based on Electron.',
+                url: 'https://gitee.com/yanke_4_0/imf-post',
+                icon: '🧠',
+                host: 'gitee',
+                langs: [{ name: 'Vue' }, { name: 'JavaScript' }],
+                stars: 1,
+            },
+            {
+                name: 'Self_Official_Web',
+                desc: 'The website I use for my official and personal presence.',
+                url: 'https://github.com/ComoYo-Yanke/self_-official_-web',
+                icon: '🌐',
+                host: 'github',
+                langs: [
+                    { name: 'Vue', pct: 58.5 },
+                    { name: 'CSS', pct: 17.1 },
+                    { name: 'Java', pct: 13.8 },
+                    { name: 'HTML', pct: 6.7 },
+                    { name: 'JavaScript', pct: 3.9 },
+                ],
+                stars: 0,
             },
         ];
 
@@ -1032,7 +1169,10 @@
       `).join('')
                 : '<div class="empty">No posts yet.</div>';
 
-            const projectsPreview = PROJECTS.slice(0, 3).map(renderProjectCard).join('');
+            /* 首页只放 featured 的项目，没标注就退回前 3 个 */
+            const featured = PROJECTS.filter(p => p.featured);
+            const projectsPreview = (featured.length ? featured : PROJECTS.slice(0, 3))
+                .map(renderProjectCard).join('');
 
             app.innerHTML = `
     <section class="hero fade-in">
@@ -1051,21 +1191,55 @@
             window.scrollTo(0, 0);
         }
 
-        /* -------- 项目页 -------- */
+        /* -------- 项目卡片 -------- */
+        function langColor(name) {
+            return LANG_COLORS[name] || '#8b949e';
+        }
+
         function renderProjectCard(p) {
+            const langs = p.langs || [];
+            const measured = langs.filter(l => typeof l.pct === 'number');
+            const primary = langs[0];
+            const hostName = p.host === 'gitee' ? 'Gitee' : 'GitHub';
+
+            /* 语言占比条：只在拿到平台统计数据时才画 */
+            const langBar = measured.length > 1
+                ? `<div class="lang-bar" title="${measured.map(l => `${l.name} ${l.pct}%`).join(' · ')}">
+          ${measured.map(l => `<span style="flex:${l.pct};background:${langColor(l.name)}"></span>`).join('')}
+        </div>`
+                : '';
+
+            /* 有占比 → 只列主语言（附带百分比）；无占比 → 平铺所有语言 */
+            let langHTML = '';
+            if (primary && measured.length) {
+                langHTML = `<span class="project-lang">
+          <span class="lang-dot" style="background:${langColor(primary.name)}"></span>
+          ${primary.name}${measured.length > 1 ? ` ${primary.pct}%` : ''}
+        </span>`;
+            } else if (primary) {
+                langHTML = langs.map(l => `<span class="project-lang">
+          <span class="lang-dot" style="background:${langColor(l.name)}"></span>
+          ${l.name}
+        </span>`).join('');
+            }
+
+            /* stars 用 typeof 判断，0 也要显示出来 */
+            const starsHTML = typeof p.stars === 'number'
+                ? `<span class="project-stars" title="${p.stars} star${p.stars === 1 ? '' : 's'} on ${hostName}">${ICONS.star} ${p.stars}</span>`
+                : '';
+
             return `
     <a class="project-card" href="${p.url}" target="_blank" rel="noopener">
       <div class="project-head">
         <div class="project-icon">${p.icon}</div>
         <div class="project-name">${p.name}</div>
+        <span class="project-host" title="Hosted on ${hostName}">${p.host === 'gitee' ? ICONS.gitee : ICONS.github}</span>
       </div>
       <div class="project-desc">${p.desc}</div>
+      ${langBar}
       <div class="project-foot">
-        <span class="project-lang">
-          <span class="lang-dot" style="background:${p.langColor}"></span>
-          ${p.lang}
-        </span>
-        ${p.stars ? `<span class="project-stars">${ICONS.star} ${p.stars}</span>` : ''}
+        ${langHTML}
+        ${starsHTML}
       </div>
     </a>
   `;
