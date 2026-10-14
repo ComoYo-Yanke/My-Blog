@@ -19,6 +19,15 @@ A minimal static blog built with pure **HTML + CSS + JavaScript**, hosted on **C
 - 📋 One-click copy for contact info
 - ⚡ Zero dependencies (only marked.js via CDN) · one Node script regenerates the post list
 
+### Add Content — the 30-second version
+
+| I want to… | Do this | Then |
+|---|---|---|
+| **Publish a post** | Create `posts/<name>.md` with front matter ([copy `posts/_template.md`](posts/_template.md)) | `node scripts/build-posts.mjs` → commit & push |
+| **Publish a project** | Add one object to the `PROJECTS` array in [`index.html`](index.html) | commit & push |
+
+That's the whole flow — **nothing else in the site needs editing.** Full details below: [Add a Post](#add-a-post) · [Add a Project](#add-a-project) · [Troubleshooting](#troubleshooting).
+
 ### Structure
 
 ```
@@ -28,8 +37,9 @@ A minimal static blog built with pure **HTML + CSS + JavaScript**, hosted on **C
 │   └── build-posts.mjs   # Scans posts/*.md, writes posts/index.json
 ├── posts/
 │   ├── index.json        # GENERATED — the post list the site fetches
+│   ├── _template.md      # Not published (starts with _) — copy this to start a post
 │   ├── hello.md
-│   └── my-trip.md
+│   └── 羞耻文章.md
 └── README.md
 ```
 
@@ -37,7 +47,7 @@ Pages: `#/` home (hero + latest posts + featured projects) · `#/posts` all post
 
 ### Add a Post
 
-**1. Create a Markdown file** in `posts/` with front matter at the top:
+**1. Create a Markdown file** in `posts/` with front matter at the top — easiest is to copy the ready-made [`posts/_template.md`](posts/_template.md) to `posts/my-trip.md` and edit it:
 
 ```markdown
 ---
@@ -157,6 +167,30 @@ npx serve
 - `PROJECTS` is still a **hand-maintained array** in `index.html`. Posts are not — they're discovered from `posts/*.md` by the build script.
 - Google Translate may be **unstable in mainland China**. For CN readers, browser built-in translation is a good fallback.
 - Themes use `localStorage`; translation uses Google's own `googtrans` cookie.
+- The Google Translate feature is **disabled on purpose** (its code block is commented out in `index.html`). Four empty stubs stand in for the functions the rest of the script still calls, so nothing throws. To re-enable it, un-comment that block — the real functions are declared after the stubs, so they win automatically.
+
+### Troubleshooting
+
+| What you see | Why | Fix |
+|---|---|---|
+| `😕 Could not load posts/index.json` | Opening `index.html` by double-clicking it — `file://` blocks `fetch()` | Serve over HTTP: `python -m http.server 8000` (or `npx serve`) |
+| `😕 Could not load posts/index.json` (over HTTP too) | `posts/index.json` missing or empty | `node scripts/build-posts.mjs` |
+| `😕 Failed to load post (posts/…)` | The `.md` the manifest points at was renamed or deleted | Re-run the build script; check the filename matches `file` in `posts/index.json` |
+| Post stuck on the **Loading** spinner | `posts/index.json` lists it but the file 404s | Same as above — re-run the build script |
+| New post never shows up | You forgot to regenerate the manifest | `node scripts/build-posts.mjs`, then hard-reload (Ctrl+F5) |
+| A `.md` file is silently ignored | Its name starts with `_`, or it has `draft: true` | Rename it, or drop `draft` |
+| Post title shows the filename | No `title:` in the front matter | Add one, or accept the filename-derived title |
+| `---` / `title:` shows up in the article body | Front matter block isn't at the very top of the file | It must be the **first** thing in the file, with no blank line above it |
+
+Quick sanity check after adding a post — the build script should name your file in its output:
+
+```bash
+node scripts/build-posts.mjs
+#   post   my-trip.md  -> My Trip  (2026-10-20)
+#   wrote  posts/index.json  (4 posts)
+```
+
+If it printed a `warnings:` line, read it — it says exactly which post has a problem.
 
 ---
 
@@ -173,6 +207,15 @@ npx serve
 - 📋 联系方式一键复制
 - ⚡ 零依赖（仅 CDN 引入 marked.js）· 一个 Node 脚本负责生成文章清单
 
+### 怎么加内容 —— 30 秒版
+
+| 我想…… | 这样做 | 然后 |
+|---|---|---|
+| **发一篇文章** | 在 `posts/` 下新建 `名字.md`，开头写 front matter（直接复制 [`posts/_template.md`](posts/_template.md)） | `node scripts/build-posts.mjs` → 提交推送 |
+| **加一个项目** | 在 [`index.html`](index.html) 的 `PROJECTS` 数组里加一个对象 | 提交推送 |
+
+就这么多，**站点其他地方都不用动**。详细步骤在下面：[新增文章](#新增文章) · [新增项目](#新增项目) · [常见问题](#常见问题)。
+
 ### 项目结构
 
 ```
@@ -182,8 +225,9 @@ npx serve
 │   └── build-posts.mjs   # 扫描 posts/*.md，生成 posts/index.json
 ├── posts/
 │   ├── index.json        # 自动生成，页面读的就是它
+│   ├── _template.md      # 不发布（下划线开头）—— 写新文章时复制它
 │   ├── hello.md
-│   └── my-trip.md
+│   └── 羞耻文章.md
 └── README.md
 ```
 
@@ -191,7 +235,7 @@ npx serve
 
 ### 新增文章
 
-**1. 在 `posts/` 下创建 Markdown 文件**，开头写上 front matter：
+**1. 在 `posts/` 下创建 Markdown 文件**，开头写上 front matter —— 最省事的做法是把现成的 [`posts/_template.md`](posts/_template.md) 复制成 `posts/我的文章.md` 再改：
 
 ```markdown
 ---
@@ -311,21 +355,33 @@ npx serve
 - `PROJECTS` 仍然是 `index.html` 里**手动维护**的数组；文章不是，文章由构建脚本从 `posts/*.md` 自动发现。
 - Google 翻译在**中国大陆可能不稳定**。国内读者建议用浏览器自带翻译作为备选。
 - 主题用 `localStorage` 存储；翻译用 Google 自带的 `googtrans` cookie。
+- Google 翻译功能是**故意关掉的**（`index.html` 里那一整块代码被注释了）。因为脚本别处还在调用那几个函数，所以留了四个空实现顶上，不会报错。想启用就把那段注释解开 —— 真正的实现写在空实现**后面**，会自动覆盖。
+
+### 常见问题
+
+| 现象 | 原因 | 怎么办 |
+|---|---|---|
+| `😕 Could not load posts/index.json` | 直接双击打开了 `index.html`，`file://` 协议下 `fetch()` 被浏览器禁掉 | 用 HTTP 服务器打开：`python -m http.server 8000`（或 `npx serve`） |
+| `😕 Could not load posts/index.json`（HTTP 下也一样） | `posts/index.json` 丢了或内容为空 | 跑 `node scripts/build-posts.mjs` |
+| `😕 Failed to load post (posts/…)` | 清单里指向的那个 `.md` 被改名或删掉了 | 重新跑构建脚本；确认文件名和 `posts/index.json` 里的 `file` 一致 |
+| 文章页一直转圈（Loading） | 清单里有这篇，但文件 404 了 | 同上，重新跑构建脚本 |
+| 新写的文章不出现 | 忘了重新生成清单 | `node scripts/build-posts.mjs`，然后强刷（Ctrl+F5） |
+| 某个 `.md` 被无视了 | 文件名以 `_` 开头，或者写了 `draft: true` | 改名字，或者去掉 `draft` |
+| 标题显示成了文件名 | front matter 里没写 `title:` | 补一行，或者就用文件名生成的标题 |
+| 正文里冒出了 `---` 或 `title:` | front matter 没放在文件最开头 | 它必须是文件的**第一行内容**，上面不能有空行 |
+
+加完文章后想确认一下，看构建脚本的输出里有没有你的文件：
+
+```bash
+node scripts/build-posts.mjs
+#   post   my-trip.md  -> My Trip  (2026-10-20)
+#   wrote  posts/index.json  (4 posts)
+```
+
+如果打印了 `warnings:`，照着读 —— 它会直接指出是哪篇文章的问题。
 
 ---
 
 ## License
 
 MIT
-```
-
----
-
-## 📌 说明
-
-- **一个文件、中英合一**，顶部有 `English | 中文` 锚点跳转
-- 篇幅控制在 **约 150 行**，比上一版精简了一半
-- 保留了最核心的四件事：**新增文章、新增项目、改个人信息、部署**
-- 去掉了"为什么用 localStorage"这类解释性内容，只留操作
-
-需要我再配一个更短的 **`LICENSE`** 文件（MIT 标准文本）吗？
