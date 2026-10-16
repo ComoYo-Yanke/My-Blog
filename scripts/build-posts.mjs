@@ -54,16 +54,24 @@ const isTrue = v => /^(true|yes|1)$/i.test(String(v ?? '').trim());
 const titleFromSlug = slug =>
     slug.replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
+/** 正文第一个一级标题：# 01 · 提瓦特创世与起源 -> 01 · 提瓦特创世与起源 */
+function titleFromBody(body) {
+    const m = body.match(/^[ \t]*#[ \t]+(.+?)[ \t]*#*[ \t]*$/m);
+    return m ? m[1].trim() : '';
+}
+
 const toDate = d => {
     const p = n => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 };
 
-/** 取正文第一段纯文字当摘要，跳过标题、代码块、列表、引用、HTML */
+/** 取正文第一段纯文字当摘要，跳过标题、代码块、表格、列表、HTML、分隔线 */
 function excerptFromBody(body, max = 140) {
     for (const block of body.split(/\r?\n[ \t]*\r?\n/)) {
-        const t = block.trim();
-        if (!t || /^(#{1,6}\s|```|~~~|>|\||[-*+]\s|\d+\.\s|<)/.test(t)) continue;
+        let t = block.trim();
+        if (!t || /^(#{1,6}\s|```|~~~|\||[-*+]\s|\d+\.\s|<)/.test(t)) continue;
+        if (/^([-*_])[ \t]*\1[ \t]*\1+$/.test(t)) continue;   // --- / *** / ___ 分隔线
+        t = t.replace(/^[ \t]*>[ \t]?/gm, '');                // 开头的引用块正好当摘要，去掉 > 就行
         const plain = t.replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[*_`#]/g, '').replace(/\s+/g, ' ').trim();
         if (!plain) continue;
         return plain.length > max ? plain.slice(0, max).replace(/\s+\S*$/, '') + '…' : plain;
@@ -100,7 +108,10 @@ for (const entry of entries) {
     if (seen.has(slug)) warnings.push(`${entry.name}: slug「${slug}」和别的文章重复了，URL 会撞车`);
     seen.add(slug);
 
-    if (!data.title) warnings.push(`${entry.name}: 没写 title，已用文件名「${titleFromSlug(stem)}」代替`);
+    /* 标题优先级：front matter > 正文第一个 # 一级标题 > 文件名。
+       正文里写了一级标题就说明作者已经定好标题了，不用再去文件名上凑。 */
+    const heading = titleFromBody(body);
+    if (!data.title && !heading) warnings.push(`${entry.name}: 没写 title，已用文件名「${titleFromSlug(stem)}」代替`);
 
     let date = data.date || '';
     if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
@@ -114,7 +125,7 @@ for (const entry of entries) {
     posts.push({
         slug,
         file: entry.name,
-        title: data.title || titleFromSlug(stem),
+        title: data.title || heading || titleFromSlug(stem),
         date,
         tags: parseTags(data.tags),
         excerpt,

@@ -1249,6 +1249,30 @@
             return { page: 'home' };
         }
 
+        /* 文章之间会互相引用（[01_xxx](01_xxx.md)）。浏览器把这种链接当普通相对路径请求，
+           落到 /01_xxx.md 直接 404。这里换成站内路由 #/post/<slug>，交给 hashchange 处理。 */
+        function postHref(target) {
+            const clean = decodeURIComponent(String(target).split('#')[0].split('?')[0]).replace(/^\.?\//, '');
+            if (!/\.md$/i.test(clean)) return null;
+            const stem = clean.replace(/\.md$/i, '');
+            const hit = POSTS.find(p => (p.file || '').toLowerCase() === clean.toLowerCase())
+                     || POSTS.find(p => p.slug === clean)
+                     || POSTS.find(p => p.slug === stem)
+                     || POSTS.find(p => (p.file || '').replace(/\.md$/i, '') === stem);
+            return hit ? '#/post/' + encodeURIComponent(hit.slug) : null;
+        }
+
+        /* 渲染完正文后把 .md 链接改成站内跳转。
+           万一指向一个没发布的文件（比如 _draft.md），就退回指向 posts/ 下的原始 .md。 */
+        function rewritePostLinks(html) {
+            return html.replace(/href=(["'])([^"']+\.md(?:#[^"']*)?)\1/gi, (all, q, target) => {
+                const href = postHref(target);
+                if (href) return 'href=' + q + href + q;
+                const clean = decodeURIComponent(String(target).split('#')[0]).replace(/^\.?\//, '');
+                return 'href=' + q + 'posts/' + clean + q;
+            });
+        }
+
         /* ============================================================
            6. 工具函数
            ============================================================ */
@@ -1580,7 +1604,7 @@ ${contactCardHTML()}
                 if (!res.ok) throw new Error('not found');
                 const md = await res.text();
                 if (seq !== navSeq) return; // 正文还在路上时用户又跳走了，别覆盖新页面
-                body.innerHTML = marked.parse(stripFrontMatter(md));
+                body.innerHTML = rewritePostLinks(marked.parse(stripFrontMatter(md)));
             } catch (e) {
                 if (seq !== navSeq) return;
                 body.innerHTML = `<div class="empty">😕 Failed to load post (posts/${file})</div>`;
