@@ -19,6 +19,21 @@ A minimal static blog built with pure **HTML + CSS + JavaScript**, hosted on **C
 - 📋 One-click copy for contact info
 - ⚡ Zero dependencies (only marked.js via CDN) · one Node script regenerates the post list
 
+### Search
+
+The home page has a search box that covers **both posts and projects**. Focus it from anywhere with the `/` key or `Ctrl`/`⌘`+`K`; `Esc` clears it.
+
+| | What's searched | Fuzzy? |
+|---|---|---|
+| **Posts** | title, tags, excerpt, slug, **and the full body text** | title/slug/tags: yes · excerpt/body: exact substring |
+| **Projects** | name, description, language names | name: yes · description/languages: exact substring |
+
+- **Fuzzy means two things**: a plain substring match always wins, and if that fails the letters just have to appear *in order* — so `hw` finds **Hello, World** and `slfweb` finds **Self_Official_Web**.
+- **Multiple words are AND-ed** (`hello world` needs both).
+- **Post bodies are fetched lazily** the first time you search, then cached for the session — searching costs no extra requests until you actually type something.
+- Matches that land in a short field are highlighted with `<mark>`.
+- Search only sees posts listed in `posts/index.json`, so **run the build script after adding a post** or it won't be searchable.
+
 ### Add Content — the 30-second version
 
 | I want to… | Do this | Then |
@@ -181,6 +196,8 @@ npx serve
 | A `.md` file is silently ignored | Its name starts with `_`, or it has `draft: true` | Rename it, or drop `draft` |
 | Post title shows the filename | No `title:` in the front matter | Add one, or accept the filename-derived title |
 | `---` / `title:` shows up in the article body | Front matter block isn't at the very top of the file | It must be the **first** thing in the file, with no blank line above it |
+| Search can't find a post you just wrote | The post isn't in `posts/index.json` yet | `node scripts/build-posts.mjs`, then reload |
+| Search finds nothing for a word you know is in a post | The body text is being fetched for the first time | Give it a moment — the "searching post contents…" note disappears when it's done |
 
 Quick sanity check after adding a post — the build script should name your file in its output:
 
@@ -206,6 +223,21 @@ If it printed a `warnings:` line, read it — it says exactly which post has a p
 - 🚀 项目作品展示
 - 📋 联系方式一键复制
 - ⚡ 零依赖（仅 CDN 引入 marked.js）· 一个 Node 脚本负责生成文章清单
+
+### 搜索
+
+首页有一个搜索框，**文章和项目一起搜**。任何页面按 `/` 或 `Ctrl`/`⌘`+`K` 都能跳过去，`Esc` 清空。
+
+| | 搜哪些字段 | 支持模糊？ |
+|---|---|---|
+| **文章** | 标题、标签、摘要、slug，以及**正文全文** | 标题/slug/标签：支持 · 摘要/正文：只认连续子串 |
+| **项目** | 名称、描述、语言名 | 名称：支持 · 描述/语言：只认连续子串 |
+
+- **模糊有两层**：连续子串优先；子串找不到时，字母按顺序出现也算命中 —— 所以 `hw` 能搜到 **Hello, World**，`slfweb` 能搜到 **Self_Official_Web**。
+- **多个词是 AND 关系**（`hello world` 两个都得命中）。
+- **正文是按需加载的**：第一次搜索时才去抓 `.md`，之后缓存在内存里，所以不搜就不产生额外请求。
+- 命中短字段（标题、名称）的地方会用 `<mark>` 标出来。
+- 搜索只认 `posts/index.json` 里列出的文章，所以**加了新文章记得先跑构建脚本**，否则搜不到。
 
 ### 怎么加内容 —— 30 秒版
 
@@ -369,6 +401,8 @@ npx serve
 | 某个 `.md` 被无视了 | 文件名以 `_` 开头，或者写了 `draft: true` | 改名字，或者去掉 `draft` |
 | 标题显示成了文件名 | front matter 里没写 `title:` | 补一行，或者就用文件名生成的标题 |
 | 正文里冒出了 `---` 或 `title:` | front matter 没放在文件最开头 | 它必须是文件的**第一行内容**，上面不能有空行 |
+| 刚写的文章搜不到 | 它还没进 `posts/index.json` | 跑 `node scripts/build-posts.mjs`，再刷新 |
+| 明明正文里有这个词却搜不到 | 正文是第一次搜索时才去抓的，还没到位 | 等一下，「searching post contents…」消失后就全了 |
 
 加完文章后想确认一下，看构建脚本的输出里有没有你的文件：
 

@@ -257,6 +257,108 @@
             flex-wrap: wrap;
         }
 
+        /* ---------- 首页搜索 ---------- */
+        .search-wrap {
+            position: relative;
+            max-width: 420px;
+            margin: 26px auto 0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 11px 40px;
+            font: inherit;
+            font-size: .95em;
+            color: var(--text);
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s, background .15s;
+        }
+
+        .search-input::placeholder { color: var(--text-soft); }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            background: var(--bg);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        /* 浏览器自带的清除按钮太丑，用我们自己的 */
+        .search-input::-webkit-search-cancel-button { display: none; }
+
+        .search-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            color: var(--text-soft);
+            pointer-events: none;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-soft);
+            font-size: .85em;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .search-clear:hover { background: var(--border); color: var(--text); }
+        .search-clear[hidden] { display: none; }
+
+        .search-hint {
+            margin-top: 12px;
+            font-size: .8em;
+            color: var(--text-soft);
+        }
+
+        .search-hint kbd {
+            font: inherit;
+            font-size: .95em;
+            padding: 1px 5px;
+            border: 1px solid var(--border);
+            border-bottom-width: 2px;
+            border-radius: 4px;
+            background: var(--bg-soft);
+        }
+
+        /* 搜索结果 */
+        .search-summary {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: .92em;
+            color: var(--text-soft);
+        }
+
+        .search-note { font-size: .9em; opacity: .75; }
+
+        mark {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-radius: 3px;
+            padding: 0 1px;
+        }
+
+        #search-results[hidden],
+        #home-default[hidden] { display: none; }
+
         /* 社交按钮（带图标） */
         .social-btn {
             display: inline-flex;
@@ -1203,6 +1305,7 @@
             mail: `<svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`,
             copy: `<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>`,
             star: `<svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+            search: `<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l4.99 4.99L20.48 19l-4.98-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>`,
         };
 
         /* 生成社交按钮 HTML */
@@ -1226,11 +1329,14 @@
 
         /* -------- 首页 -------- */
         /* -------- 文章卡片（首页 / 文章页共用） -------- */
-        function renderPostCard(p) {
+        /* hl 只在搜索结果里传进来（负责转义 + 高亮）；平时走原样插值，行为不变。
+           用 typeof 判断而不是真值判断：.map(renderPostCard) 会把下标当成第二个参数传进来。 */
+        function renderPostCard(p, hl) {
+            const T = (field, s) => (typeof hl === 'function' ? hl(field, s) : s);
             return `
     <a class="post-card" onclick="navigate('post/${encodeURIComponent(p.slug)}')">
-      <h2>${p.title}</h2>
-      ${p.excerpt ? `<div class="excerpt">${p.excerpt}</div>` : ''}
+      <h2>${T('title', p.title)}</h2>
+      ${p.excerpt ? `<div class="excerpt">${T('excerpt', p.excerpt)}</div>` : ''}
       <div class="post-meta">
         <span>📅 ${p.date}</span>
         ${(p.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
@@ -1294,14 +1400,20 @@
       <h1>${SITE.name}</h1>
       <p>${SITE.bio}</p>
       <div class="socials">${socialButtons()}</div>
+${searchBoxHTML()}
     </section>
 
-    <div class="section-title">Latest Posts${POSTS.length ? `<a class="view-all" onclick="navigate('posts')">View all →</a>` : ''}</div>
-    <div class="post-list fade-in">${postsHTML}</div>
+    <div id="search-results" hidden></div>
 
-    <div class="section-title">Featured Projects</div>
-    <div class="project-grid fade-in">${projectsPreview}</div>
+    <div id="home-default">
+      <div class="section-title">Latest Posts${POSTS.length ? `<a class="view-all" onclick="navigate('posts')">View all →</a>` : ''}</div>
+      <div class="post-list fade-in">${postsHTML}</div>
+
+      <div class="section-title">Featured Projects</div>
+      <div class="project-grid fade-in">${projectsPreview}</div>
+    </div>
   `;
+            attachSearch();
             window.scrollTo(0, 0);
         }
 
@@ -1327,7 +1439,9 @@ ${contactCardHTML()}
             return LANG_COLORS[name] || '#8b949e';
         }
 
-        function renderProjectCard(p) {
+        /* hl 同 renderPostCard：.map(renderProjectCard) 会把下标传进来，所以用 typeof 判断 */
+        function renderProjectCard(p, hl) {
+            const T = (field, s) => (typeof hl === 'function' ? hl(field, s) : s);
             const langs = p.langs || [];
             const measured = langs.filter(l => typeof l.pct === 'number');
             const primary = langs[0];
@@ -1363,10 +1477,10 @@ ${contactCardHTML()}
     <a class="project-card" href="${p.url}" target="_blank" rel="noopener">
       <div class="project-head">
         <div class="project-icon">${p.icon}</div>
-        <div class="project-name">${p.name}</div>
+        <div class="project-name">${T('name', p.name)}</div>
         <span class="project-host" title="Hosted on ${hostName}">${p.host === 'gitee' ? ICONS.gitee : ICONS.github}</span>
       </div>
-      <div class="project-desc">${p.desc}</div>
+      <div class="project-desc">${T('desc', p.desc)}</div>
       ${langBar}
       <div class="project-foot">
         ${langHTML}
@@ -1500,10 +1614,289 @@ ${contactCardHTML()}
         }
 
         /* ============================================================
-           8. Google 翻译集成 —— 目前整块被注释掉了
+           8. 搜索（首页）—— 模糊匹配文章 + 项目
+           ============================================================ */
+
+        /* 分词时忽略、匹配时可以跳过的字符 */
+        const SEARCH_SEP = /[\s\-_./\\,;:!?()[\]{}"'`~@#$%^&*+=|<>·—–…、，。；：！？（）【】《》“”‘’]/;
+
+        /* 命中哪个字段的权重：标题 > 标签 > 摘要 > 正文 */
+        const FIELD_WEIGHT = { title: 2, name: 2, tags: 1.2, excerpt: 1, desc: 1, slug: .8, body: .6 };
+
+        /* 允许模糊（子序列）匹配的字段 —— 标题、名字、标签这种短而确定的。
+           摘要/描述/正文只认连续子串：否则 "react" 能在一整段英文描述里凑出
+           r..e..a..c..t，把压根没提它的项目也算命中。
+           语言名也不做模糊："vue"/"python"/"java" 用户都是照着输入，
+           放开只会让 "test" 因为 t..e..s..t 命中 TypeScript。 */
+        const FUZZY_FIELDS = new Set(['title', 'name', 'tags', 'slug', 'host']);
+
+        function esc(s) {
+            return String(s).replace(/[&<>"']/g, c =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        /* 一个词对一段文本打分。命中返回 { score, ranges }，ranges 是 [start, end) 区间，用来画高亮 */
+        function matchText(text, q, fuzzy) {
+            const lower = String(text).toLowerCase();
+            const needle = q.toLowerCase();
+            if (!needle) return null;
+
+            /* 1) 连续子串优先 */
+            const at = lower.indexOf(needle);
+            if (at !== -1) {
+                let score = 1000 - Math.min(at, 200) + needle.length * 8;
+                if (at === 0) score += 120;                            // 就在开头
+                else if (SEARCH_SEP.test(lower[at - 1])) score += 80;  // 词首
+                return { score, ranges: [[at, at + needle.length]] };
+            }
+
+            /* 长字段到此为止，不做模糊 */
+            if (!fuzzy) return null;
+
+            /* 2) 退而求其次：子序列。跳字越多分越低，"hw" 也能命中 "Hello, World" */
+            let from = 0, prev = -1, start = -1, gaps = 0, adjacent = 0;
+            const hits = [];
+            for (const c of needle) {
+                if (SEARCH_SEP.test(c)) continue;   // query 里的空格/连字符不算数
+                let found = -1;
+                for (let i = from; i < lower.length; i++) if (lower[i] === c) { found = i; break; }
+                if (found === -1) return null;
+                if (start === -1) start = found;
+                if (prev !== -1) { if (found === prev + 1) adjacent++; else gaps += found - prev - 1; }
+                hits.push(found);
+                prev = found;
+                from = found + 1;
+            }
+            if (!hits.length) return null;
+
+            /* 命中散得太开就丢掉。否则 "vue" 能在一整段描述里凑出 v..u..e，
+               把一个只是碰巧有这三个字母的项目也算命中，结果全是噪音
+               （span 是首尾命中之间的跨度）。 */
+            if (prev - start + 1 > needle.length * 4 + 4) return null;
+
+            /* 挨着的命中合成一个区间，高亮才不会一格一格的 */
+            const ranges = [];
+            for (const i of hits) {
+                const last = ranges[ranges.length - 1];
+                if (last && last[1] === i) last[1] = i + 1;
+                else ranges.push([i, i + 1]);
+            }
+            return { score: 400 + adjacent * 12 - Math.min(gaps, 120) - Math.min(start, 100), ranges };
+        }
+
+        /* 每个词都必须命中（AND），且可以命中不同字段 */
+        function scoreFields(fields, tokens) {
+            let total = 0;
+            const ranges = {};
+            for (const t of tokens) {
+                let best = null, bestField = null;
+                for (const [name, text] of Object.entries(fields)) {
+                    if (!text) continue;
+                    const m = matchText(text, t, FUZZY_FIELDS.has(name));
+                    if (!m) continue;
+                    const sc = m.score * (FIELD_WEIGHT[name] || 1);
+                    if (!best || sc > best.score) { best = { score: sc, ranges: m.ranges }; bestField = name; }
+                }
+                if (!best) return null;
+                total += best.score;
+                (ranges[bestField] = ranges[bestField] || []).push(...best.ranges);
+            }
+            return { score: total, ranges };
+        }
+
+        const searchTokens = q => q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+
+        /* ---------- 正文索引：第一次搜索时才按需抓，抓到就缓存 ---------- */
+        const POST_BODIES = new Map();   // slug -> 抹平的纯文本
+        let bodiesLoading = false;
+        let bodiesDone = false;
+
+        /** 把 Markdown 抹成纯文本，只为搜索用 */
+        function mdToPlain(md) {
+            return stripFrontMatter(md)
+                .replace(/```[\s\S]*?```/g, ' ')                 // 代码块
+                .replace(/`[^`]*`/g, ' ')                        // 行内代码
+                .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')           // 图片
+                .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')         // 链接留文字
+                .replace(/^\s{0,3}#{1,6}\s+/gm, ' ')             // 标题符号
+                .replace(/^\s{0,3}>\s?/gm, ' ')                  // 引用
+                .replace(/^\s*[-*+]\s+/gm, ' ')                  // 列表
+                .replace(/[*_~|]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        async function loadPostBodies() {
+            if (bodiesLoading || bodiesDone) return;
+            bodiesLoading = true;
+            await Promise.all(POSTS.map(async p => {
+                if (POST_BODIES.has(p.slug)) return;
+                try {
+                    const res = await fetch('posts/' + encodeURIComponent(p.file || p.slug + '.md'));
+                    if (res.ok) POST_BODIES.set(p.slug, mdToPlain(await res.text()));
+                } catch (e) { /* 正文抓不到就算了，标题和摘要照常能搜 */ }
+            }));
+            bodiesLoading = false;
+            bodiesDone = true;
+            /* 正文到位了，把当前结果重画一遍，让只命中正文的也冒出来 */
+            const input = document.getElementById('search-input');
+            if (input && input.value.trim()) renderSearchResults(input.value.trim());
+        }
+
+        /* ---------- 检索 ---------- */
+
+        function searchPosts(q) {
+            const tokens = searchTokens(q);
+            if (!tokens.length) return [];
+            const out = [];
+            for (const p of POSTS) {
+                const hit = scoreFields({
+                    title: p.title,
+                    excerpt: p.excerpt,
+                    tags: (p.tags || []).join(' '),
+                    slug: p.slug,
+                    body: POST_BODIES.get(p.slug) || '',
+                }, tokens);
+                if (hit) out.push({ post: p, ...hit });
+            }
+            return out.sort((a, b) => b.score - a.score || b.post.date.localeCompare(a.post.date));
+        }
+
+        function searchProjects(q) {
+            const tokens = searchTokens(q);
+            if (!tokens.length) return [];
+            const out = [];
+            for (const p of PROJECTS) {
+                const hit = scoreFields({
+                    name: p.name,
+                    desc: p.desc,
+                    langs: (p.langs || []).map(l => l.name).join(' '),
+                    host: p.host === 'gitee' ? 'gitee github' : 'github',
+                }, tokens);
+                if (hit) out.push({ project: p, ...hit });
+            }
+            return out.sort((a, b) => b.score - a.score);
+        }
+
+        /* ---------- 结果渲染 ---------- */
+
+        function highlightHTML(text, ranges) {
+            if (!ranges || !ranges.length) return esc(text);
+            let out = '', last = 0;
+            for (const [s, e] of ranges) {
+                if (s < last || e <= s) continue;   // 区间交叉就跳过，别把标签套乱
+                out += esc(text.slice(last, s)) + '<mark>' + esc(text.slice(s, e)) + '</mark>';
+                last = e;
+            }
+            return out + esc(text.slice(last));
+        }
+
+        const hitHL = hit => (field, value) => highlightHTML(value, hit.ranges[field]);
+
+        function renderSearchResults(q) {
+            const box = document.getElementById('search-results');
+            if (!box) return;
+
+            loadPostBodies();   // 第一次搜索时才去抓正文，抓到会再调一次本函数
+
+            const posts = searchPosts(q);
+            const projects = searchProjects(q);
+            const total = posts.length + projects.length;
+            const pending = bodiesDone ? '' : '<span class="search-note">searching post contents…</span>';
+
+            if (!total) {
+                box.innerHTML = `
+      <div class="search-summary"><span>No matches for “${esc(q)}”</span>${pending}</div>
+      <div class="empty">
+        <p>😕 Nothing found.</p>
+        <p style="margin-top:8px;font-size:.9em">Try a shorter word, or a tag like <code>Essay</code>.</p>
+      </div>`;
+                return;
+            }
+
+            box.innerHTML = `
+      <div class="search-summary">
+        <span>${total} result${total === 1 ? '' : 's'} for “${esc(q)}”</span>${pending}
+      </div>
+      ${posts.length ? `
+      <div class="section-title">Posts<span class="count">${posts.length}</span></div>
+      <div class="post-grid fade-in">${posts.map(h => renderPostCard(h.post, hitHL(h))).join('')}</div>` : ''}
+      ${projects.length ? `
+      <div class="section-title">Projects<span class="count">${projects.length}</span></div>
+      <div class="project-grid fade-in">${projects.map(h => renderProjectCard(h.project, hitHL(h))).join('')}</div>` : ''}
+    `;
+        }
+
+        /* ---------- 搜索框 ---------- */
+
+        function searchBoxHTML() {
+            return `
+      <div class="search-wrap">
+        <span class="search-icon">${ICONS.search}</span>
+        <input id="search-input" class="search-input" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Search posts and projects…" aria-label="Search posts and projects">
+        <button id="search-clear" class="search-clear" type="button" hidden aria-label="Clear search">✕</button>
+      </div>
+      <div class="search-hint">Press <kbd>/</kbd> or <kbd>Ctrl</kbd>+<kbd>K</kbd> to jump here</div>`;
+        }
+
+        let lastQuery = '';   // 从结果点进文章再退回来，别把搜的词弄丢了
+
+        function attachSearch() {
+            const input = document.getElementById('search-input');
+            const clear = document.getElementById('search-clear');
+            const results = document.getElementById('search-results');
+            const fallback = document.getElementById('home-default');
+            if (!input || !results) return;
+
+            const run = () => {
+                lastQuery = input.value.trim();
+                if (clear) clear.hidden = !input.value;
+                if (!lastQuery) {
+                    results.hidden = true;
+                    results.innerHTML = '';
+                    if (fallback) fallback.hidden = false;
+                    return;
+                }
+                if (fallback) fallback.hidden = true;
+                results.hidden = false;
+                renderSearchResults(lastQuery);
+            };
+
+            input.addEventListener('input', run);
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Escape') { input.value = ''; run(); input.blur(); }
+                if (e.key === 'Enter') e.preventDefault();   // 没有表单，回车别乱跳
+            });
+            if (clear) clear.addEventListener('click', () => { input.value = ''; run(); input.focus(); });
+
+            if (lastQuery) { input.value = lastQuery; run(); }   // 回到首页时接着上次的结果
+        }
+
+        /* 全局快捷键：/ 或 Ctrl+K 跳到搜索框 */
+        function focusSearch(tries = 24) {
+            const input = document.getElementById('search-input');
+            if (input) { input.focus(); input.select(); return; }
+            if (tries > 0) setTimeout(() => focusSearch(tries - 1), 50);   // 首页还在渲染就再等等
+        }
+
+        function handleSearchShortcut(e) {
+            const el = e.target;
+            const tag = ((el && el.tagName) || '').toLowerCase();
+            const typing = tag === 'input' || tag === 'textarea' || (el && el.isContentEditable);
+            const slash = e.key === '/' && !typing && !e.ctrlKey && !e.metaKey && !e.altKey;
+            const cmdK = (e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'k' || e.key === 'K');
+            if (!slash && !cmdK) return;
+            e.preventDefault();
+            if (!document.getElementById('search-input')) navigate('home');   // 别的页面就先回首页
+            focusSearch();
+        }
+
+        /* ============================================================
+           9. Google 翻译集成 —— 目前整块被注释掉了
 
            但调用点还留在 init() 和 renderPost() 里，直接调会抛
-           ReferenceError。这里先放四个空实现顶上。
+           ReferenceError。这里先放几个空实现顶上。
 
            注意：它们必须写在真正的实现「前面」——同名的函数声明后者生效，
            所以哪天要启用翻译，把下面那整段注释解开即可，这里不用动。
@@ -1594,7 +1987,7 @@ ${contactCardHTML()}
         }
 */
         /* ============================================================
-           9. 初始化
+           10. 初始化
            ============================================================ */
         function init() {
             const savedTheme = localStorage.getItem('blog-theme');
@@ -1616,6 +2009,7 @@ ${contactCardHTML()}
             app.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
 
             window.addEventListener('hashchange', router);
+            document.addEventListener('keydown', handleSearchShortcut);
             router();
             updateTranslateBtn();
             loadGoogleTranslate();
