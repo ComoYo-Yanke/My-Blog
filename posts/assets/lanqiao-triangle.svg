@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" width="760" height="430" role="img" aria-label="数字三角形：自底向上 DP，答案是 30">
+  <rect x="0" y="0" width="760" height="430" rx="14" fill="#f7f8fa" stroke="#e3e6ea"/>
+  <text x="32" y="40" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="17" font-weight="600" fill="#2b3038">数字三角形</text>
+  <text x="130" y="40" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#8b93a2">经典 DP · 自底向上</text>
+
+  <text x="210" y="92" text-anchor="middle" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#8b93a2">原始数字</text>
+  <text x="560" y="92" text-anchor="middle" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#8b93a2">dp 值（从这一格出发的最大和）</text>
+
+  <!-- 连线：左 -->
+  <g stroke="#dfe3e9" stroke-width="1.5">
+    <line x1="210" y1="120" x2="180" y2="170"/><line x1="210" y1="120" x2="240" y2="170"/>
+    <line x1="180" y1="170" x2="150" y2="220"/><line x1="180" y1="170" x2="210" y2="220"/>
+    <line x1="240" y1="170" x2="210" y2="220"/><line x1="240" y1="170" x2="270" y2="220"/>
+    <line x1="150" y1="220" x2="120" y2="270"/><line x1="150" y1="220" x2="180" y2="270"/>
+    <line x1="210" y1="220" x2="180" y2="270"/><line x1="210" y1="220" x2="240" y2="270"/>
+    <line x1="270" y1="220" x2="240" y2="270"/><line x1="270" y1="220" x2="300" y2="270"/>
+    <line x1="120" y1="270" x2="90" y2="320"/><line x1="120" y1="270" x2="150" y2="320"/>
+    <line x1="180" y1="270" x2="150" y2="320"/><line x1="180" y1="270" x2="210" y2="320"/>
+    <line x1="240" y1="270" x2="210" y2="320"/><line x1="240" y1="270" x2="270" y2="320"/>
+    <line x1="300" y1="270" x2="270" y2="320"/><line x1="300" y1="270" x2="330" y2="320"/>
+  </g>
+  <!-- 连线：右 -->
+  <g stroke="#c9d9f7" stroke-width="1.5">
+    <line x1="560" y1="120" x2="530" y2="170"/><line x1="560" y1="120" x2="590" y2="170"/>
+    <line x1="530" y1="170" x2="500" y2="220"/><line x1="530" y1="170" x2="560" y2="220"/>
+    <line x1="590" y1="170" x2="560" y2="220"/><line x1="590" y1="170" x2="620" y2="220"/>
+    <line x1="500" y1="220" x2="470" y2="270"/><line x1="500" y1="220" x2="530" y2="270"/>
+    <line x1="560" y1="220" x2="530" y2="270"/><line x1="560" y1="220" x2="590" y2="270"/>
+    <line x1="620" y1="220" x2="590" y2="270"/><line x1="620" y1="220" x2="650" y2="270"/>
+    <line x1="470" y1="270" x2="440" y2="320"/><line x1="470" y1="270" x2="500" y2="320"/>
+    <line x1="530" y1="270" x2="500" y2="320"/><line x1="530" y1="270" x2="560" y2="320"/>
+    <line x1="590" y1="270" x2="560" y2="320"/><line x1="590" y1="270" x2="620" y2="320"/>
+    <line x1="650" y1="270" x2="620" y2="320"/><line x1="650" y1="270" x2="680" y2="320"/>
+  </g>
+
+  <!-- 左：原始数字 -->
+  <g fill="#ffffff" stroke="#c7cdd6" stroke-width="1.5">
+    <circle cx="210" cy="120" r="19"/>
+    <circle cx="180" cy="170" r="19"/><circle cx="240" cy="170" r="19"/>
+    <circle cx="150" cy="220" r="19"/><circle cx="210" cy="220" r="19"/><circle cx="270" cy="220" r="19"/>
+    <circle cx="120" cy="270" r="19"/><circle cx="180" cy="270" r="19"/><circle cx="240" cy="270" r="19"/><circle cx="300" cy="270" r="19"/>
+    <circle cx="90" cy="320" r="19"/><circle cx="150" cy="320" r="19"/><circle cx="210" cy="320" r="19"/><circle cx="270" cy="320" r="19"/><circle cx="330" cy="320" r="19"/>
+  </g>
+  <g font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="14" font-weight="600" fill="#2b3038" text-anchor="middle">
+    <text x="210" y="125">7</text>
+    <text x="180" y="175">3</text><text x="240" y="175">8</text>
+    <text x="150" y="225">8</text><text x="210" y="225">1</text><text x="270" y="225">0</text>
+    <text x="120" y="275">2</text><text x="180" y="275">7</text><text x="240" y="275">4</text><text x="300" y="275">4</text>
+    <text x="90" y="325">4</text><text x="150" y="325">5</text><text x="210" y="325">2</text><text x="270" y="325">6</text><text x="330" y="325">5</text>
+  </g>
+
+  <!-- 右：dp -->
+  <g fill="#93b4f5" stroke="#3b82f6" stroke-width="1.5">
+    <circle cx="530" cy="170" r="19"/><circle cx="590" cy="170" r="19"/>
+    <circle cx="500" cy="220" r="19"/><circle cx="560" cy="220" r="19"/><circle cx="620" cy="220" r="19"/>
+    <circle cx="470" cy="270" r="19"/><circle cx="530" cy="270" r="19"/><circle cx="590" cy="270" r="19"/><circle cx="650" cy="270" r="19"/>
+    <circle cx="440" cy="320" r="19"/><circle cx="500" cy="320" r="19"/><circle cx="560" cy="320" r="19"/><circle cx="620" cy="320" r="19"/><circle cx="680" cy="320" r="19"/>
+  </g>
+  <circle cx="560" cy="120" r="21" fill="#fde68a" stroke="#d97706" stroke-width="1.5"/>
+  <g font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13.5" font-weight="600" fill="#16305c" text-anchor="middle">
+    <text x="530" y="175">23</text><text x="590" y="175">21</text>
+    <text x="500" y="225">20</text><text x="560" y="225">13</text><text x="620" y="225">10</text>
+    <text x="470" y="275">7</text><text x="530" y="275">12</text><text x="590" y="275">10</text><text x="650" y="275">10</text>
+    <text x="440" y="325">4</text><text x="500" y="325">5</text><text x="560" y="325">2</text><text x="620" y="325">6</text><text x="680" y="325">5</text>
+  </g>
+  <text x="560" y="125" text-anchor="middle" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="14" font-weight="700" fill="#8a4b00">30</text>
+
+  <!-- 中间箭头 -->
+  <g stroke="#9aa3b2" stroke-width="1.5" fill="none">
+    <line x1="372" y1="220" x2="420" y2="220"/>
+    <path d="M420 220 l-9 -5 v10 z" fill="#9aa3b2" stroke="none"/>
+  </g>
+
+  <text x="380" y="386" text-anchor="middle" font-family="ui-monospace, Consolas, monospace" font-size="13" fill="#3f4856">dp[i][j] = a[i][j] + max(dp[i+1][j], dp[i+1][j+1])</text>
+  <text x="380" y="408" text-anchor="middle" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="12.5" fill="#7b8494">从最下面一行开始往上推，dp[0][0] 就是答案</text>
+</svg>

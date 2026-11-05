@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" width="760" height="380" role="img" aria-label="生日蜡烛：26 岁到 33 岁的蜡烛数合计 236">
+  <rect x="0" y="0" width="760" height="380" rx="14" fill="#f7f8fa" stroke="#e3e6ea"/>
+  <text x="32" y="42" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="17" font-weight="600" fill="#2b3038">生日蜡烛</text>
+  <text x="132" y="42" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#8b93a2">2016 · C/C++ B 组 · 填空题</text>
+  <text x="32" y="68" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#7b8494">每年吹灭与年龄相同根数的蜡烛，累计 236 根</text>
+
+  <!-- 合计标注 -->
+  <text x="380" y="100" text-anchor="middle" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="14" font-weight="600" fill="#d97706">合计 236 根</text>
+  <path d="M104 112 V120 H656 V112" fill="none" stroke="#d97706" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- 基线 -->
+  <line x1="80" y1="300" x2="700" y2="300" stroke="#d5dae1" stroke-width="1.5"/>
+
+  <!-- 柱：26..33，比例 5px/根 -->
+  <g fill="#93b4f5" stroke="#3b82f6" stroke-width="1">
+    <rect x="104" y="170" width="48" height="130" rx="4"/>
+    <rect x="176" y="165" width="48" height="135" rx="4"/>
+    <rect x="248" y="160" width="48" height="140" rx="4"/>
+    <rect x="320" y="155" width="48" height="145" rx="4"/>
+    <rect x="392" y="150" width="48" height="150" rx="4"/>
+    <rect x="464" y="145" width="48" height="155" rx="4"/>
+    <rect x="536" y="140" width="48" height="160" rx="4"/>
+    <rect x="608" y="135" width="48" height="165" rx="4"/>
+  </g>
+
+  <!-- 数值 -->
+  <g font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="12" fill="#4a5260" text-anchor="middle" font-weight="600">
+    <text x="128" y="162">26</text>
+    <text x="200" y="157">27</text>
+    <text x="272" y="152">28</text>
+    <text x="344" y="147">29</text>
+    <text x="416" y="142">30</text>
+    <text x="488" y="137">31</text>
+    <text x="560" y="132">32</text>
+    <text x="632" y="127">33</text>
+  </g>
+
+  <!-- 年龄 -->
+  <g font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#7b8494" text-anchor="middle">
+    <text x="128" y="322">26 岁</text>
+    <text x="200" y="322">27</text>
+    <text x="272" y="322">28</text>
+    <text x="344" y="322">29</text>
+    <text x="416" y="322">30</text>
+    <text x="488" y="322">31</text>
+    <text x="560" y="322">32</text>
+    <text x="632" y="322">33</text>
+  </g>
+
+  <text x="380" y="356" text-anchor="middle" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#5b6472">26 + 27 + 28 + 29 + 30 + 31 + 32 + 33 = 236</text>
+</svg>

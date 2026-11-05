@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" width="760" height="380" role="img" aria-label="分巧克力：切出的块数随边长单调不增，二分找最大可行边长">
+  <rect x="0" y="0" width="760" height="380" rx="14" fill="#f7f8fa" stroke="#e3e6ea"/>
+  <text x="32" y="42" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="17" font-weight="600" fill="#2b3038">分巧克力</text>
+  <text x="112" y="42" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#8b93a2">2017 · C/C++ B 组 · 编程题</text>
+  <text x="32" y="68" font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#7b8494">边长 s 越大，能切出的块数越少 —— 单调，所以能二分</text>
+
+  <!-- 坐标轴 -->
+  <line x1="100" y1="300" x2="690" y2="300" stroke="#c7cdd6" stroke-width="1.5"/>
+  <line x1="100" y1="300" x2="100" y2="90" stroke="#c7cdd6" stroke-width="1.5"/>
+  <path d="M690 300 l-9 -4 v8 z" fill="#c7cdd6"/>
+  <path d="M100 90 l-4 9 h8 z" fill="#c7cdd6"/>
+
+  <text x="40" y="200" transform="rotate(-90 40 200)" text-anchor="middle"
+        font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#7b8494">切出的块数 f(s)</text>
+  <text x="400" y="342" text-anchor="middle"
+        font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="13" fill="#7b8494">边长 s</text>
+
+  <!-- 曲线 -->
+  <path d="M118 112 C 190 196 250 238 340 264 C 440 284 570 292 678 294"
+        fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- K 水平线 -->
+  <line x1="100" y1="205" x2="690" y2="205" stroke="#d97706" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="684" y="196" text-anchor="end"
+        font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="12.5" fill="#d97706">需要 K 块</text>
+
+  <!-- 交点 -->
+  <line x1="228" y1="205" x2="228" y2="300" stroke="#d97706" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <circle cx="228" cy="205" r="4.5" fill="#d97706"/>
+  <text x="228" y="322" text-anchor="middle"
+        font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="12.5" font-weight="600" fill="#d97706">s*</text>
+
+  <!-- 可行区 / 不可行区 -->
+  <rect x="100" y="90" width="128" height="210" fill="#3b82f6" opacity="0.06"/>
+  <text x="164" y="112" text-anchor="middle"
+        font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="12" fill="#3b82f6">可行</text>
+  <text x="470" y="176" text-anchor="middle"
+        font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="12" fill="#9aa3b2">不可行（切不够 K 块）</text>
+
+  <text x="690" y="112" text-anchor="end"
+        font-family="system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="12.5" fill="#5b6472">答案 = 满足 f(s) ≥ K 的最大 s</text>
+</svg>
