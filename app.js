@@ -1382,7 +1382,63 @@ function initCursorFx() {
 }
 
 /* ============================================================
-   12. 初始化
+   12. 原子鼠标 / 开屏
+   ============================================================ */
+function initAtomCursor() {
+    const atom = document.getElementById('atom');
+    if (!atom || reducedMotion()) return;
+    if (typeof window.matchMedia === 'function' &&
+        !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    const HOT = 'a,button,[onclick],.stat,.post-card,.project-card,.back-btn,.view-all,.theme-btn';
+    let shown = false;
+
+    /* 原生指针只在原子指针生效后才藏起来 */
+    document.documentElement.classList.add('atom-cursor-on');
+
+    window.addEventListener('pointermove', e => {
+        atom.style.transform = 'translate3d(' + e.clientX + 'px,' + e.clientY + 'px,0)';
+        if (!shown) { shown = true; atom.classList.add('on'); }
+        const t = e.target;
+        const hot = !!(t && t.closest && t.closest(HOT));
+        atom.classList.toggle('hot', hot);
+    }, { passive: true });
+
+    window.addEventListener('pointerleave', () => {
+        shown = false;
+        atom.classList.remove('on');
+    });
+    window.addEventListener('pointerenter', () => {
+        shown = true;
+        atom.classList.add('on');
+    });
+}
+
+function revealPage() {
+    const body = document.body;
+    if (!body || body.classList.contains('reveal')) return;
+    body.classList.add('reveal');
+    /* 入场动画只跑首屏这一次，之后路由切换继续用 pageIn */
+    setTimeout(() => body.classList.remove('reveal'), 1700);
+}
+
+function hideSplash() {
+    const splash = document.getElementById('splash');
+    if (!splash || splash.dataset.gone) return;
+    splash.dataset.gone = '1';
+    splash.classList.add('done'); /* 文字和转圈先淡出 */
+    const quiet = reducedMotion();
+    setTimeout(() => {
+        splash.classList.add('leave'); /* 遮罩再整体滑下去 */
+        revealPage(); /* 遮罩开始退的同一刻，后面的内容从四面八方聚过来 */
+        setTimeout(() => {
+            if (splash.parentNode) splash.parentNode.removeChild(splash);
+        }, quiet ? 20 : 850);
+    }, quiet ? 0 : 240);
+}
+
+/* ============================================================
+   13. 初始化
    ============================================================ */
 function init() {
     const savedTheme = localStorage.getItem('blog-theme');
@@ -1417,10 +1473,20 @@ function init() {
     updateSidebar();
     loadPosts().then(updateSidebar);
 
-    router();
+    const firstRender = router();
     updateTranslateBtn();
     loadGoogleTranslate();
     initCursorFx();
+    initAtomCursor();
+
+    /* 从开始加载算起：至少 1.5s 才退场，最晚 1.9s 开始退，3s 内收干净 */
+    const SPLASH_MIN = 1500;
+    const SPLASH_MAX = 1900;
+    const dismiss = () => {
+        setTimeout(hideSplash, Math.max(0, SPLASH_MIN - performance.now()));
+    };
+    Promise.resolve(firstRender).then(dismiss).catch(dismiss);
+    setTimeout(hideSplash, Math.max(0, SPLASH_MAX - performance.now()));
 }
 
 document.addEventListener('DOMContentLoaded', init);
