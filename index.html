@@ -29,6 +29,7 @@
             --code-bg: rgba(255, 255, 255, .62);
 
             --grid: rgba(15, 23, 42, .10);
+            --grid-hot: color-mix(in srgb, var(--accent) 34%, transparent);
             --glow-a: #6366f1;
             --glow-b: #06b6d4;
             --glow-c: #ec4899;
@@ -147,7 +148,10 @@
             content: '';
             position: fixed;
             inset: -10%;
-            z-index: -2;
+            z-index: -3;
+            /* 跟着鼠标轻微反向漂移，跟动画里的 transform 互不干扰 */
+            translate: var(--par-x, 0px) var(--par-y, 0px);
+            transition: translate .5s ease-out;
             background:
                 radial-gradient(46rem 32rem at 10% -6%, color-mix(in srgb, var(--glow-a) 34%, transparent), transparent 62%),
                 radial-gradient(40rem 28rem at 94% 2%, color-mix(in srgb, var(--glow-b) 28%, transparent), transparent 62%),
@@ -161,7 +165,7 @@
             content: '';
             position: fixed;
             inset: 0;
-            z-index: -1;
+            z-index: -2;
             pointer-events: none;
             background-image:
                 linear-gradient(var(--grid) 1px, transparent 1px),
@@ -169,6 +173,31 @@
             background-size: 46px 46px;
             -webkit-mask-image: radial-gradient(ellipse 130% 95% at 50% 0%, #000 34%, transparent 92%);
             mask-image: radial-gradient(ellipse 130% 95% at 50% 0%, #000 34%, transparent 92%);
+        }
+
+        /* 跟随鼠标的柔光：一层大而淡的径向光，靠渐变色收边，不用模糊 */
+        .cursor-glow {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 760px;
+            height: 760px;
+            margin: -380px 0 0 -380px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0;
+            background: radial-gradient(circle closest-side,
+                    color-mix(in srgb, var(--accent) 13%, transparent) 0%,
+                    color-mix(in srgb, var(--accent) 6%, transparent) 38%,
+                    color-mix(in srgb, var(--accent-2) 3%, transparent) 62%,
+                    transparent 100%);
+            will-change: transform, opacity;
+            transition: opacity .7s ease;
+        }
+
+        .cursor-on .cursor-glow {
+            opacity: 1;
         }
 
         @keyframes drift {
@@ -402,39 +431,13 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            /* 高度够就完全固定，不留内部滚动条；实在太小才允许滚一点 */
-            max-height: calc(100vh - 100px);
-            overflow-y: auto;
-            overscroll-behavior: contain;
-            scrollbar-width: thin;
-            scrollbar-color: transparent transparent;
-        }
-
-        /* 滚动条平时隐身，鼠标移上来才淡淡露出来 */
-        .sidebar:hover {
-            scrollbar-color: color-mix(in srgb, var(--text) 13%, transparent) transparent;
+            /* 整列锁定：不设高度上限、不产生内部滚动 */
+            overflow: visible;
+            scrollbar-width: none;
         }
 
         .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: transparent;
-            border-radius: 99px;
-            transition: background .2s ease;
-        }
-
-        .sidebar:hover::-webkit-scrollbar-thumb {
-            background: color-mix(in srgb, var(--text) 13%, transparent);
-        }
-
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background: color-mix(in srgb, var(--text) 26%, transparent);
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: transparent;
+            display: none;
         }
 
         .content {
@@ -1946,12 +1949,56 @@
                 scroll-behavior: auto;
             }
         }
+
+        /* ===================== 鼠标指针 ===================== */
+        :root {
+            /* 默认：一个极简的小选框 */
+            --cursor-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'%3E%3Crect x='4.5' y='4.5' width='9' height='9' rx='1' fill='none' stroke='%232563eb' stroke-width='1.3'/%3E%3C/svg%3E") 9 9, default;
+            /* 可点元素：同一个框，内部淡淡填上颜色 */
+            --cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'%3E%3Crect x='4.5' y='4.5' width='9' height='9' rx='1' fill='%232563eb' fill-opacity='.22' stroke='%232563eb' stroke-width='1.5'/%3E%3C/svg%3E") 9 9, pointer;
+        }
+
+        html {
+            cursor: var(--cursor-arrow);
+        }
+
+        a,
+        button,
+        summary,
+        label,
+        [onclick],
+        .post-card,
+        .project-card,
+        .stat,
+        .theme-btn,
+        .view-all,
+        .back-btn {
+            cursor: var(--cursor-pointer);
+        }
+
+        /* 输入框还是用系统文字光标，打字时位置感更准 */
+        input,
+        textarea {
+            cursor: text;
+        }
+
+        @media (hover: none), (pointer: coarse) {
+            html,
+            a,
+            button,
+            [onclick] {
+                cursor: auto;
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <div class="read-progress" id="read-progress"></div>
+
+    <!-- 跟着鼠标走的两层背景光效 -->
+    <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
 
     <nav class="navbar">
         <div class="navbar-inner">

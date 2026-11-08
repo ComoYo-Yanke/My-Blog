@@ -1324,7 +1324,65 @@ function updateSidebar() {
 }
 
 /* ============================================================
-   11. 初始化
+   11. 跟随鼠标的背景光效
+   ============================================================ */
+function initCursorFx() {
+    const glow = document.getElementById('cursor-glow');
+    if (!glow || reducedMotion()) return;
+    /* 触屏、没有精确指针的设备直接跳过 */
+    if (typeof window.matchMedia === 'function' &&
+        !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    let tx = window.innerWidth / 2, ty = window.innerHeight * 0.4;
+    let x = tx, y = ty, running = false;
+
+    function paint() {
+        glow.style.transform =
+            'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
+    }
+
+    function frame() {
+        x += (tx - x) * 0.085; /* 慢一点跟上，光斑是“跟”而不是“粘” */
+        y += (ty - y) * 0.085;
+        paint();
+        if (Math.abs(tx - x) < 0.4 && Math.abs(ty - y) < 0.4) {
+            x = tx; y = ty; paint();
+            running = false;
+            return;
+        }
+        requestAnimationFrame(frame);
+    }
+
+    function wake() {
+        if (running) return;
+        running = true;
+        requestAnimationFrame(frame);
+    }
+
+    window.addEventListener('pointermove', e => {
+        tx = e.clientX;
+        ty = e.clientY;
+        document.documentElement.classList.add('cursor-on');
+        /* 极光色块朝反方向轻轻让开一点，制造层次 */
+        const nx = e.clientX / window.innerWidth - 0.5;
+        const ny = e.clientY / window.innerHeight - 0.5;
+        document.body.style.setProperty('--par-x', (nx * -16).toFixed(1) + 'px');
+        document.body.style.setProperty('--par-y', (ny * -12).toFixed(1) + 'px');
+        wake();
+    }, { passive: true });
+
+    window.addEventListener('pointerleave', () => {
+        document.documentElement.classList.remove('cursor-on');
+    });
+    window.addEventListener('pointerenter', () => {
+        document.documentElement.classList.add('cursor-on');
+    });
+
+    paint();
+}
+
+/* ============================================================
+   12. 初始化
    ============================================================ */
 function init() {
     const savedTheme = localStorage.getItem('blog-theme');
@@ -1362,6 +1420,7 @@ function init() {
     router();
     updateTranslateBtn();
     loadGoogleTranslate();
+    initCursorFx();
 }
 
 document.addEventListener('DOMContentLoaded', init);
