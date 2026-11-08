@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -I C:/Users/Yanke/AppData/Local/Temp/mtest2/patch_splash.py)"
+    ]
+  }
+}

@@ -2022,6 +2022,7 @@
             z-index: 3000;
             display: grid;
             place-items: center;
+            overflow: hidden;
             background: var(--bg);
             /* JS 没跑起来时，2.2 秒后自己滑走并淡出，不能把页面锁死 */
             animation: splashFallback .7s cubic-bezier(.33, 0, .2, 1) 2.2s forwards;
@@ -2032,23 +2033,64 @@
             position: absolute;
             inset: -20%;
             background:
-                radial-gradient(30rem 22rem at 50% 42%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 65%),
-                radial-gradient(26rem 20rem at 50% 70%, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 65%);
+                radial-gradient(32rem 24rem at 50% 40%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 64%),
+                radial-gradient(28rem 22rem at 50% 68%, color-mix(in srgb, var(--accent-2) 11%, transparent), transparent 64%);
             pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 淡淡的网格，给开屏一点纵深 */
+        .splash::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 46px 46px;
+            -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000 18%, transparent 68%);
+            mask-image: radial-gradient(ellipse at 50% 50%, #000 18%, transparent 68%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .splash-inner {
             position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 22px;
             transition: opacity .35s ease, transform .35s ease;
+        }
+
+        @keyframes splashMarkIn {
+            from {
+                opacity: 0;
+                transform: scale(.82) rotate(-16deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        @keyframes splashFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(9px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .splash.done .splash-inner {
             opacity: 0;
-            transform: translateY(-12px);
+            transform: translateY(-14px);
         }
 
         .splash.leave {
@@ -2059,7 +2101,8 @@
             box-shadow: 0 -34px 80px color-mix(in srgb, var(--accent) 20%, transparent);
         }
 
-        .splash.leave::before {
+        .splash.leave::before,
+        .splash.leave::after {
             opacity: 0;
             transition: opacity .5s ease;
         }
@@ -2071,77 +2114,181 @@
             }
         }
 
-        .splash-badge {
+        /* 原子标志：外圈是转动的进度光环 */
+        .splash-mark {
+            position: relative;
+            width: 112px;
+            height: 112px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            /* 进度环的轨道 */
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 14%, transparent),
+                0 0 44px color-mix(in srgb, var(--accent) 10%, transparent);
+            animation: splashMarkIn .85s cubic-bezier(.22, 1, .36, 1) backwards;
+        }
+
+        .splash-mark::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg,
+                    transparent 0deg,
+                    transparent 195deg,
+                    color-mix(in srgb, var(--accent) 70%, transparent) 265deg,
+                    var(--accent-2) 335deg,
+                    transparent 360deg);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+            animation: spin 2.6s linear infinite;
+        }
+
+        .splash-mark::after {
+            content: '';
+            position: absolute;
+            inset: 18px;
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                    color-mix(in srgb, var(--accent) 20%, transparent),
+                    transparent 70%);
+            animation: pulse 2.2s ease-in-out infinite;
+        }
+
+        .splash-atom {
             position: relative;
             width: 74px;
             height: 74px;
+            overflow: visible;
         }
 
-        .splash-badge .orbit {
-            position: absolute;
-            border-radius: 50%;
-            border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+        .splash-atom .sp-orbit {
+            fill: none;
+            stroke: color-mix(in srgb, var(--accent) 40%, transparent);
+            stroke-width: 1;
         }
 
-        .splash-badge .orbit-a {
-            inset: 0;
-            border-top-color: var(--accent);
-            animation: spin 1.5s linear infinite;
+        .splash-atom .sp-core-halo {
+            fill: color-mix(in srgb, var(--accent) 26%, transparent);
         }
 
-        .splash-badge .orbit-b {
-            inset: 11px;
-            border-bottom-color: var(--accent-2);
-            animation: spin 2.3s linear infinite reverse;
+        .splash-atom .sp-core {
+            fill: var(--accent);
         }
 
-        .splash-badge .core {
-            position: absolute;
-            inset: 29px;
-            border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 0 16px var(--accent);
-            animation: pulse 1.4s ease-in-out infinite;
+        .splash-atom .sp-electron {
+            fill: var(--accent-2);
+            filter: drop-shadow(0 0 4px var(--accent-2));
         }
 
-        .splash-text {
+        .splash-word {
             font-family: var(--mono);
-            font-size: .78em;
-            letter-spacing: .34em;
+            font-size: .92em;
+            font-weight: 600;
+            letter-spacing: .32em;
+            padding-left: .32em;
             text-transform: uppercase;
-            color: var(--text-soft);
-            padding-left: .34em;
+            background: linear-gradient(100deg,
+                    var(--text) 18%,
+                    color-mix(in srgb, var(--accent) 72%, var(--text)) 52%,
+                    color-mix(in srgb, var(--accent-2) 66%, var(--text)) 82%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: splashFadeUp .6s cubic-bezier(.22, 1, .36, 1) .16s backwards;
         }
 
-        .splash-line {
-            width: 190px;
-            height: 2px;
-            border-radius: 2px;
+        .splash-bar {
+            width: 220px;
+            height: 3px;
+            border-radius: 3px;
             overflow: hidden;
             background: color-mix(in srgb, var(--text) 10%, transparent);
+            animation: splashFadeUp .6s cubic-bezier(.22, 1, .36, 1) .26s backwards;
         }
 
-        .splash-line i {
+        .splash-bar i {
             display: block;
-            width: 42%;
+            width: 0;
             height: 100%;
-            border-radius: 2px;
+            border-radius: 3px;
             background: linear-gradient(90deg, var(--accent), var(--accent-2));
-            animation: splashSlide 1.15s ease-in-out infinite;
+            box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+            animation: splashFill 1.1s cubic-bezier(.22, 1, .36, 1) .25s forwards;
         }
 
-        @keyframes splashSlide {
-            from {
-                transform: translateX(-110%);
+        @keyframes splashFill {
+            to {
+                width: 100%;
+            }
+        }
+
+        .splash-meta {
+            width: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--mono);
+            font-size: .68em;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--text-mute);
+            animation: splashFadeUp .6s cubic-bezier(.22, 1, .36, 1) .36s backwards;
+        }
+
+        .splash-dots {
+            display: inline-flex;
+            gap: 5px;
+        }
+
+        .splash-dots i {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: .2;
+            animation: splashDot 1.1s ease-in-out infinite;
+        }
+
+        .splash-dots i:nth-child(2) {
+            animation-delay: .15s;
+        }
+
+        .splash-dots i:nth-child(3) {
+            animation-delay: .3s;
+        }
+
+        @keyframes splashDot {
+
+            0%,
+            100% {
+                opacity: .2;
+                transform: translateY(0);
             }
 
-            to {
-                transform: translateX(340%);
+            50% {
+                opacity: 1;
+                transform: translateY(-3px);
             }
         }
 
         @media (prefers-reduced-motion: reduce) {
             .splash {
+                animation: none;
+            }
+
+            .splash-mark,
+            .splash-mark::before,
+            .splash-mark::after,
+            .splash-word,
+            .splash-bar,
+            .splash-meta,
+            .splash-dots i {
+                animation: none;
+            }
+
+            .splash-bar i {
+                width: 100%;
                 animation: none;
             }
         }
@@ -2269,16 +2416,43 @@
 
 <body>
 
-    <!-- 开屏：内容淡出后整块遮罩向下滑走 -->
+    <!-- 开屏：原子标志 + 进度条；内容淡出后遮罩向下滑走并淡出 -->
     <div class="splash" id="splash" aria-hidden="true">
         <div class="splash-inner">
-            <div class="splash-badge">
-                <span class="orbit orbit-a"></span>
-                <span class="orbit orbit-b"></span>
-                <span class="core"></span>
+            <div class="splash-mark">
+                <svg class="splash-atom" viewBox="0 0 68 68">
+                    <circle class="sp-core-halo" cx="34" cy="34" r="9" />
+                    <circle class="sp-core" cx="34" cy="34" r="3.4" />
+                    <g transform="rotate(0 34 34)">
+                        <ellipse class="sp-orbit" cx="34" cy="34" rx="27" ry="10" />
+                        <circle class="sp-electron" r="2.6">
+                            <animateMotion dur="2.8s" repeatCount="indefinite"
+                                path="M7 34a27 10 0 1 0 54 0a27 10 0 1 0 -54 0" />
+                        </circle>
+                    </g>
+                    <g transform="rotate(60 34 34)">
+                        <ellipse class="sp-orbit" cx="34" cy="34" rx="27" ry="10" />
+                        <circle class="sp-electron" r="2.6">
+                            <animateMotion dur="3.6s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1"
+                                calcMode="linear"
+                                path="M7 34a27 10 0 1 0 54 0a27 10 0 1 0 -54 0" />
+                        </circle>
+                    </g>
+                    <g transform="rotate(120 34 34)">
+                        <ellipse class="sp-orbit" cx="34" cy="34" rx="27" ry="10" />
+                        <circle class="sp-electron" r="2.6">
+                            <animateMotion dur="3.2s" repeatCount="indefinite"
+                                path="M7 34a27 10 0 1 0 54 0a27 10 0 1 0 -54 0" />
+                        </circle>
+                    </g>
+                </svg>
             </div>
-            <p class="splash-text">Loading</p>
-            <div class="splash-line"><i></i></div>
+            <div class="splash-word">CoMoYo-Yanke</div>
+            <div class="splash-bar"><i></i></div>
+            <div class="splash-meta">
+                <span>Loading</span>
+                <span class="splash-dots"><i></i><i></i><i></i></span>
+            </div>
         </div>
     </div>
 
